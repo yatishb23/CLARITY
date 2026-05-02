@@ -128,10 +128,10 @@ export function ImageViewer() {
               <div className="absolute inset-0 w-16 h-16 border-2 border-accent border-t-transparent rounded-full animate-spin" />
             </div>
             <div className="text-center">
-              <p className="text-sm font-bold text-white tracking-widest uppercase mb-2 animate-pulse font-sans">
+              <p className="text-sm font-bold text-foreground tracking-widest uppercase mb-2 animate-pulse font-sans">
                 Processing Voxel Data
               </p>
-              <p className="text-[10px] text-zinc-500 max-w-[200px]">
+              <p className="text-[10px] text-muted-foreground max-w-[200px]">
                 MedGemma is computing attention weights across the spatial
                 domain...
               </p>
@@ -175,8 +175,8 @@ export function ImageViewer() {
             </div>
           </div>
         ) : (
-          <div className="relative z-10 flex flex-col items-center gap-4 text-zinc-500">
-            <div className="p-6 rounded-3xl border border-zinc-800 bg-zinc-900/50">
+          <div className="relative z-10 flex flex-col items-center gap-4 text-muted-foreground">
+            <div className="p-6 rounded-3xl border border-border bg-muted/50">
               <Maximize2 size={32} className="opacity-20" />
             </div>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em]">
@@ -188,8 +188,8 @@ export function ImageViewer() {
 
       {/* Detail View (Only shows when a sentence is selected) */}
       {selectedSentenceIndex !== null && currentOverlay && (
-        <div className="h-[220px] bg-black/90 border-t border-border/10 flex flex-col p-4 z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-3 flex items-center justify-between">
+        <div className="h-[220px] bg-card/95 backdrop-blur border-t border-border flex flex-col p-4 z-20 shadow-md">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3 flex items-center justify-between">
             <span>
               Attention Breakdown (Sentence {selectedSentenceIndex + 1})
             </span>
@@ -199,21 +199,21 @@ export function ImageViewer() {
           >
             {/* Original */}
             <div className="flex flex-col items-center gap-2">
-              <div className="flex-1 w-full bg-zinc-950 rounded-lg border border-zinc-800/50 overflow-hidden relative shadow-[0_0_20px_rgba(0,0,0,0.8)] border-black">
+              <div className="flex-1 w-full bg-black rounded-lg border border-border overflow-hidden relative shadow-sm">
                 <img
                   src={`data:image/png;base64,${selectedImage}`}
                   alt="Original"
                   className="absolute inset-0 w-full h-full object-contain"
                 />
               </div>
-              <span className="text-[9px] uppercase tracking-wider text-zinc-400">
+              <span className="text-[9px] uppercase tracking-wider text-muted-foreground">
                 Original
               </span>
             </div>
             {/* Attention Map (Only if available) */}
             {(currentAttentionMap || currentHeatmapData) && (
               <div className="flex flex-col items-center gap-2">
-                <div className="flex-1 w-full bg-zinc-950 rounded-lg border border-zinc-800/50 overflow-hidden relative shadow-[0_0_20px_rgba(0,0,0,0.8)] border-black">
+                <div className="flex-1 w-full bg-black rounded-lg border border-border overflow-hidden relative shadow-sm">
                   {currentAttentionMap ? (
                     <img
                       src={`data:image/png;base64,${currentAttentionMap}`}
@@ -224,21 +224,21 @@ export function ImageViewer() {
                     <HeatmapCanvas data={currentHeatmapData} />
                   ) : null}
                 </div>
-                <span className="text-[9px] uppercase tracking-wider text-zinc-400">
+                <span className="text-[9px] uppercase tracking-wider text-muted-foreground">
                   Attention Map
                 </span>
               </div>
             )}
             {/* Overlay */}
             <div className="flex flex-col items-center gap-2">
-              <div className="flex-1 w-full bg-zinc-950 rounded-lg border border-zinc-800/50 overflow-hidden relative shadow-[0_0_20px_rgba(0,0,0,0.8)] border-black">
+              <div className="flex-1 w-full bg-black rounded-lg border border-border overflow-hidden relative shadow-sm">
                 <img
                   src={`data:image/png;base64,${currentOverlay}`}
                   alt="Overlay"
                   className="absolute inset-0 w-full h-full object-contain"
                 />
               </div>
-              <span className="text-[9px] uppercase tracking-wider text-zinc-400">
+              <span className="text-[9px] uppercase tracking-wider text-muted-foreground">
                 Overlay
               </span>
             </div>

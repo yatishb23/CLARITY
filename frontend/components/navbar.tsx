@@ -1,14 +1,28 @@
 "use client";
 
-import { Settings, User, Upload, Moon, Loader2, Activity } from "lucide-react";
-import { useState, useRef } from "react";
+import {
+  Settings,
+  User,
+  Upload,
+  Moon,
+  Sun,
+  Loader2,
+  Activity,
+} from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { useClarityStore } from "@/lib/store";
 import axios from "axios";
+import { useTheme } from "next-themes";
 
 export function Navbar() {
-  const [isDark, setIsDark] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { setAnalysis, setAnalyzing, isAnalyzing } = useClarityStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -74,11 +88,15 @@ export function Navbar() {
           </button>
 
           <button
-            onClick={() => setIsDark(!isDark)}
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="rounded-full p-2 hover:bg-secondary transition-colors"
             title="Toggle Dark Mode"
           >
-            <Moon size={20} className="text-foreground" />
+            {mounted && theme === "dark" ? (
+              <Sun size={20} className="text-foreground" />
+            ) : (
+              <Moon size={20} className="text-foreground" />
+            )}
           </button>
 
           <button className="rounded-full p-2 hover:bg-secondary transition-colors">

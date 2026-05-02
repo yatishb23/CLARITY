@@ -64,7 +64,6 @@ export function HeatmapCanvas({ data }: HeatmapCanvasProps) {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 w-full h-full object-contain"
-      style={{ imageRendering: "pixelated" }} // Prevents blurry scaling if the grid is small, e.g., 16x16
     />
   );
 }
