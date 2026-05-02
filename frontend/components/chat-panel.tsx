@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader, User, Bot, Sparkles } from "lucide-react";
+import { Send, Loader, User, Bot, MessageSquare } from "lucide-react";
 import { useClarityStore } from "@/lib/store";
 import axios from "axios";
 import { ChatMessage, ChatResponse } from "@/lib/api-types";
+
+const QUICK_PROMPTS = ["Why this diagnosis?", "Affected region?", "Confidence level?"];
 
 export function ChatPanel() {
   const { analysis, chatHistory, addChatMessage, isChatting, setChatting } =
@@ -23,27 +25,23 @@ export function ChatPanel() {
   const handleSendMessage = async (text: string = inputValue) => {
     if (!text.trim() || !analysis) return;
 
-    // 1. Add user message to UI
     const userMsg: ChatMessage = { role: "user", content: text };
     addChatMessage(userMsg);
     setInputValue("");
     setChatting(true);
 
     try {
-      // 2. Call local API proxy
       const response = await axios.post<ChatResponse>("/api/process", {
         session_id: analysis.session_id,
         message: text,
         history: chatHistory,
       });
 
-      // 3. Add assistant message
       addChatMessage({
         role: "assistant",
         content: response.data.reply,
       });
 
-      // Handle tool results (like new Grad-CAM images)
       if (response.data.image_b64) {
         useClarityStore.setState({ currentOverlay: response.data.image_b64 });
       }
@@ -52,7 +50,7 @@ export function ChatPanel() {
       addChatMessage({
         role: "assistant",
         content:
-          "I encountered an error while processing your request. Please ensure the backend is running.",
+          "Unable to process the request. Please ensure the backend service is running.",
       });
     } finally {
       setChatting(false);
@@ -60,27 +58,30 @@ export function ChatPanel() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-card border-l border-border overflow-hidden">
+    <div className="flex flex-col h-full bg-surface-primary border-l border-ui-border font-body">
       {/* Header */}
-      <div className="border-b border-border px-6 py-4 bg-secondary/50">
-        <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-          <Bot size={20} className="text-primary" />
-          Conversational Assistant
+      <div className="border-b border-ui-border px-5 py-4 bg-surface-secondary">
+        <p className="text-label-xs text-text-muted mb-0.5">AI Assistant</p>
+        <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+          <Bot size={14} className="text-clinical-teal" />
+          Diagnostic Consultation
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">
-          Ask questions about the diagnosis
-        </p>
       </div>
 
-      {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4 scrollbar-thin">
         {chatHistory.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center p-4">
-            <Sparkles size={32} className="text-primary/20 mb-3" />
-            <p className="text-sm text-muted-foreground">
+          <div className="flex flex-col items-center justify-center h-full text-center px-4 pb-8">
+            <div className="p-4 rounded-2xl border border-ui-border bg-surface-secondary mb-4">
+              <MessageSquare size={22} className="text-text-muted opacity-30" />
+            </div>
+            <p className="text-[13px] font-medium text-text-secondary mb-1">
+              {analysis ? "Ready for consultation" : "Upload an image first"}
+            </p>
+            <p className="text-[11px] text-text-muted leading-relaxed max-w-[180px]">
               {analysis
-                ? "I'm ready. Ask me anything about the scan results."
-                : "Upload an image first to enable the AI assistant."}
+                ? "Ask questions about the findings or request region-specific analysis."
+                : "A scan is required to enable the diagnostic assistant."}
             </p>
           </div>
         )}
@@ -88,25 +89,31 @@ export function ChatPanel() {
         {chatHistory.map((message, idx) => (
           <div
             key={idx}
-            className={`flex items-start gap-3 ${message.role === "user" ? "flex-row-reverse" : ""}`}
+            className={`flex items-end gap-2.5 ${
+              message.role === "user" ? "flex-row-reverse" : ""
+            }`}
           >
+            {/* Avatar */}
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                message.role === "user" ? "bg-primary/10" : "bg-accent/10"
+              className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 border ${
+                message.role === "user"
+                  ? "bg-surface-tertiary border-ui-border"
+                  : "bg-clinical-teal/10 border-clinical-teal/25"
               }`}
             >
               {message.role === "user" ? (
-                <User size={14} />
+                <User size={11} className="text-text-secondary" />
               ) : (
-                <Bot size={14} className="text-accent" />
+                <Bot size={11} className="text-clinical-teal" />
               )}
             </div>
 
+            {/* Bubble */}
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
+              className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
                 message.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary/80 border border-border text-foreground"
+                  ? "bg-clinical-teal text-white rounded-br-sm"
+                  : "bg-surface-secondary border border-ui-border text-text-primary rounded-bl-sm"
               }`}
             >
               {message.content}
@@ -115,59 +122,57 @@ export function ChatPanel() {
         ))}
 
         {isChatting && (
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
-              <Bot size={14} className="text-accent" />
+          <div className="flex items-end gap-2.5">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-clinical-teal/10 border border-clinical-teal/25">
+              <Bot size={11} className="text-clinical-teal" />
             </div>
-            <div className="bg-secondary/80 border border-border rounded-2xl px-4 py-3">
-              <Loader
-                className="animate-spin text-muted-foreground"
-                size={16}
-              />
+            <div className="bg-surface-secondary border border-ui-border rounded-2xl rounded-bl-sm px-3.5 py-3">
+              <Loader className="animate-spin text-text-muted" size={14} />
             </div>
           </div>
         )}
+
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="p-4 border-t border-border bg-card">
-        <div className="relative flex items-center gap-2">
+      {/* Quick Prompts */}
+      {analysis && chatHistory.length === 0 && (
+        <div className="px-5 pb-2 flex gap-1.5 overflow-x-auto scrollbar-hide">
+          {QUICK_PROMPTS.map((txt) => (
+            <button
+              key={txt}
+              onClick={() => handleSendMessage(txt)}
+              className="whitespace-nowrap text-[11px] font-medium px-2.5 py-1.5 rounded-md border border-ui-border bg-surface-secondary text-text-secondary hover:border-clinical-teal/40 hover:text-clinical-teal hover:bg-clinical-teal/5 transition-all"
+            >
+              {txt}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Input */}
+      <div className="px-5 py-4 border-t border-ui-border bg-surface-secondary">
+        <div className="flex items-center gap-2">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             placeholder={
-              analysis ? "Ask a question..." : "Upload image to start..."
+              analysis ? "Ask about the scan…" : "Upload image to begin"
             }
             disabled={!analysis || isChatting}
-            className="flex-1 bg-secondary/50 border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+            className="flex-1 bg-surface-primary border border-ui-border rounded-lg px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-clinical-teal/40 focus:border-clinical-teal/40 disabled:opacity-40 transition-all"
           />
           <button
             onClick={() => handleSendMessage()}
             disabled={!inputValue.trim() || !analysis || isChatting}
-            className="p-3 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="p-2.5 bg-clinical-teal text-white rounded-lg hover:bg-clinical-teal-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+            title="Send message"
           >
-            <Send size={18} />
+            <Send size={15} />
           </button>
         </div>
-
-        {analysis && chatHistory.length === 0 && (
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {["Why this diagnosis?", "Affected region?", "Confidence?"].map(
-              (txt) => (
-                <button
-                  key={txt}
-                  onClick={() => handleSendMessage(txt)}
-                  className="whitespace-nowrap px-3 py-1.5 rounded-full border border-border bg-secondary/30 text-[11px] font-medium hover:bg-secondary transition-colors"
-                >
-                  {txt}
-                </button>
-              ),
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

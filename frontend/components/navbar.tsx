@@ -50,23 +50,25 @@ export function Navbar() {
   };
 
   return (
-    <div className="border-b border-border bg-card shadow-sm sticky top-0 z-50">
-      <div className="flex items-center justify-between px-8 py-4">
-        <div className="flex items-center gap-4">
-          <div className="bg-accent/10 p-2 rounded-lg">
-            <Activity size={24} className="text-accent" />
+    <div className="sticky top-0 z-50 border-b border-ui-border bg-surface-secondary font-body">
+      <div className="flex items-center justify-between px-6 py-3">
+        {/* Wordmark */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-clinical-teal/10 border border-clinical-teal/20">
+            <Activity size={16} className="text-clinical-teal" />
           </div>
           <div>
-            <h1 className="text-xl font-header font-black tracking-tight text-primary leading-none">
-              CLARITY
+            <h1 className="text-[15px] font-bold tracking-[0.12em] text-text-primary font-body leading-none uppercase">
+              Clarity
             </h1>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mt-1">
+            <p className="text-label-xs mt-0.5">
               Clinical Decision Support
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Actions */}
+        <div className="flex items-center gap-2">
           <input
             type="file"
             ref={fileInputRef}
@@ -74,36 +76,47 @@ export function Navbar() {
             className="hidden"
             accept="image/*"
           />
+
+          {/* Primary CTA */}
           <button
             onClick={handleUploadClick}
             disabled={isAnalyzing}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent/90 text-white shadow-lg shadow-accent/20 transition-all hover:scale-[1.02] active:scale-[0.98] text-sm font-semibold disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 dark:bg-clinical-teal hover:bg-clinical-teal-dark text-white text-[13px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             {isAnalyzing ? (
-              <Loader2 className="animate-spin" size={18} />
+              <Loader2 className="animate-spin flex-shrink-0" size={14} />
             ) : (
-              <Upload size={18} />
+              <Upload size={14} className="flex-shrink-0" />
             )}
-            {isAnalyzing ? "Analyzing Scan..." : "Analyze New Scan"}
+            {isAnalyzing ? "Analyzing…" : "Analyze Scan"}
+          </button>
+
+          {/* Divider */}
+          <div className="w-px h-5 bg-ui-border mx-1" />
+
+          {/* Icon actions */}
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-hover border border-transparent hover:border-ui-border transition-all"
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+          )}
+
+          <button
+            className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-hover border border-transparent hover:border-ui-border transition-all"
+            title="Settings"
+          >
+            <Settings size={16} />
           </button>
 
           <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="rounded-full p-2 hover:bg-secondary transition-colors"
-            title="Toggle Dark Mode"
+            className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-hover border border-transparent hover:border-ui-border transition-all"
+            title="Account"
           >
-            {mounted && theme === "dark" ? (
-              <Sun size={20} className="text-foreground" />
-            ) : (
-              <Moon size={20} className="text-foreground" />
-            )}
-          </button>
-
-          <button className="rounded-full p-2 hover:bg-secondary transition-colors">
-            <Settings size={20} className="text-foreground" />
-          </button>
-          <button className="rounded-full p-2 hover:bg-secondary transition-colors">
-            <User size={20} className="text-foreground" />
+            <User size={16} />
           </button>
         </div>
       </div>

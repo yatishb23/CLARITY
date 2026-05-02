@@ -1,108 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+
 @custom-variant dark (&:is(.dark *));
+/* ============================================================
+   CLARITY MEDICAL — Design Token System
+   Supports: Light + Dark via CSS custom properties
+   ============================================================ */
 
+
+/* ── Google Fonts ─────────────────────────────────────────── */
+
+/* ── Light Mode Tokens ───────────────────────────────────── */
 :root {
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --warning: #f59e0b;
-  --warning-foreground: #ffffff;
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: #ffffff;
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.5rem;
-  --sidebar: oklch(0.985 0 0);
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --primary: #0f172a;
-  --accent: #2563eb;
-  --border: #e2e8f0;
+  /* Surfaces */
+  --surface-primary:   #f8f9fb;
+  --surface-secondary: #ffffff;
+  --surface-tertiary:  #eef0f4;
+  --surface-hover:     #f1f3f7;
+
+  /* Viewer (always dark — radiograph background) */
+  --viewer-bg:         #0d0f11;
+
+  /* Borders */
+  --ui-border:         #e2e5ec;
+  --ui-border-hover:   #c8cdd8;
+
+  /* Text */
+  --text-primary:      #111827;
+  --text-secondary:    #374151;
+  --text-muted:        #6b7280;
+
+  /* Clinical accent */
+  --clinical-teal:      #0d9488;
+  --clinical-teal-dark: #0a7a70;
+
+  /* Status */
+  --status-normal:    #16a34a;
+  --status-caution:   #d97706;
+  --status-critical:  #dc2626;
 }
 
+/* ── Dark Mode Tokens ────────────────────────────────────── */
 .dark {
-  --background: #020617;
-  --foreground: #f8fafc;
-  --card: #0f172a;
-  --border: #1e293b;
-  --primary: #f8fafc;
-  --accent: #3b82f6;
+  /* Surfaces */
+  --surface-primary:   #0f1117;
+  --surface-secondary: #161a22;
+  --surface-tertiary:  #1e2433;
+  --surface-hover:     #1a1f2c;
+
+  /* Viewer */
+  --viewer-bg:         #080a0d;
+
+  /* Borders */
+  --ui-border:         #252b38;
+  --ui-border-hover:   #323a4c;
+
+  /* Text */
+  --text-primary:      #f1f5f9;
+  --text-secondary:    #94a3b8;
+  --text-muted:        #64748b;
+
+  /* Clinical accent */
+  --clinical-teal:      #2dd4bf;
+  --clinical-teal-dark: #14b8a6;
+
+  /* Status */
+  --status-normal:    #4ade80;
+  --status-caution:   #fbbf24;
+  --status-critical:  #f87171;
 }
 
-@theme inline {
-  --font-sans: var(--font-sans);
-  --font-header: var(--font-header);
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --font-heading: var(--font-sans);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-}
-
+/* ── Base ───────────────────────────────────────────────── */
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
-    @apply font-sans;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--surface-primary);
+    color: var(--text-primary);
+  }
+
+  /* Thin scrollbar for panels */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ui-border) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar { width: 5px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: var(--ui-border);
+    border-radius: 99px;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+}
+
+/* ── Components ─────────────────────────────────────────── */
+@layer components {
+  /* Shared label micro-text */
+  .text-label-xs {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* DICOM badge pill */
+  .viewer-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.45);
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
   }
 }
