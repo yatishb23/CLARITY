@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  clarity-api:
+    build: .
+    image: clarity-api:latest
+    container_name: clarity_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - HF_TOKEN=${HF_TOKEN}          # set in .env file or shell
+      - QUANT_MODE=${QUANT_MODE:-bf16} # bf16 | int8 | int4
+    volumes:
+      - hf_cache:/cache               # persist downloaded model weights
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  hf_cache:
