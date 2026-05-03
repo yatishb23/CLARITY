@@ -40,7 +40,7 @@ export function ImageViewer() {
   return (
     <div className="flex flex-col h-full bg-surface-primary border-r border-ui-border font-body">
       {/* Header */}
-      <div className="border-b border-ui-border px-5 py-3.5 bg-surface-secondary">
+      <div className="border-b border-ui-border px-5 py-3.5 bg-surface-secondary/80 backdrop-blur-md clay-shadow-sm">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-label-xs text-text-muted mb-0.5">Imaging Modality</p>
@@ -48,30 +48,30 @@ export function ImageViewer() {
               Chest Radiograph · AP View
             </h3>
           </div>
-          <div className="flex items-center gap-1 bg-surface-primary border border-ui-border rounded-md px-1.5 py-1">
+          <div className="flex items-center gap-1.5 bg-surface-primary border border-ui-border rounded-2xl px-2 py-1.5 clay-shadow-sm">
             <button
               onClick={() => handleZoom("out")}
-              className="p-1 hover:bg-surface-hover rounded text-text-secondary hover:text-text-primary transition-colors"
+              className="p-1.5 hover:bg-surface-hover rounded-lg text-text-secondary hover:text-text-primary transition-colors"
               title="Zoom out"
             >
-              <ZoomOut size={13} />
+              <ZoomOut size={14} />
             </button>
-            <span className="text-[11px] font-mono font-semibold w-9 text-center text-text-primary tabular-nums">
+            <span className="text-[11px] font-mono font-semibold w-10 text-center text-text-primary tabular-nums">
               {Math.round(scale * 100)}%
             </span>
             <button
               onClick={() => handleZoom("in")}
-              className="p-1 hover:bg-surface-hover rounded text-text-secondary hover:text-text-primary transition-colors"
+              className="p-1.5 hover:bg-surface-hover rounded-lg text-text-secondary hover:text-text-primary transition-colors"
               title="Zoom in"
             >
-              <ZoomIn size={13} />
+              <ZoomIn size={14} />
             </button>
           </div>
         </div>
       </div>
 
       {/* Layer Controls */}
-      <div className="border-b border-ui-border px-5 py-3 bg-surface-secondary flex items-center gap-6">
+      <div className="border-b border-ui-border px-5 py-3 bg-surface-secondary/80 backdrop-blur-md clay-shadow-sm flex items-center gap-6">
         {/* Toggle */}
         <label className="flex items-center gap-2.5 cursor-pointer select-none group">
           <div className="relative flex h-5 w-9 items-center flex-shrink-0">
@@ -127,10 +127,10 @@ export function ImageViewer() {
         />
 
         {isAnalyzing ? (
-          <div className="relative z-10 flex flex-col items-center gap-5">
-            <div className="relative w-14 h-14">
-              <div className="absolute inset-0 rounded-full border border-clinical-teal/20" />
-              <div className="absolute inset-0 rounded-full border border-t-clinical-teal border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+          <div className="relative z-10 flex flex-col items-center gap-6">
+            <div className="relative w-16 h-16">
+              <div className="absolute inset-0 rounded-full border-2 border-clinical-teal/20" />
+              <div className="absolute inset-0 rounded-full border-2 border-t-clinical-teal border-r-transparent border-b-transparent border-l-transparent animate-spin" />
             </div>
             <div className="text-center">
               <p className="text-xs font-semibold text-text-secondary uppercase tracking-widest mb-1.5 animate-pulse">
@@ -153,7 +153,7 @@ export function ImageViewer() {
             <img
               src={`data:image/png;base64,${selectedImage}`}
               alt="Chest X-Ray"
-              className="w-full h-full object-contain rounded shadow-[0_0_40px_rgba(0,0,0,0.6)]"
+              className="w-full h-full object-contain rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
             />
 
             {currentOverlay && (
@@ -172,9 +172,9 @@ export function ImageViewer() {
             </div>
           </div>
         ) : (
-          <div className="relative z-10 flex flex-col items-center gap-3 text-text-muted">
-            <div className="p-5 rounded-2xl border border-ui-border bg-surface-secondary">
-              <Maximize2 size={28} className="opacity-20" />
+          <div className="relative z-10 flex flex-col items-center gap-4 text-text-muted">
+            <div className="p-5 rounded-3xl border border-ui-border bg-surface-secondary clay-shadow-sm">
+              <Maximize2 size={32} className="opacity-30" />
             </div>
             <p className="text-label-xs text-text-muted">
               Awaiting image upload
@@ -185,7 +185,7 @@ export function ImageViewer() {
 
       {/* Sentence Attention Detail */}
       {selectedSentenceIndex !== null && currentOverlay && (
-        <div className="h-[210px] bg-surface-secondary border-t border-ui-border flex flex-col p-4">
+        <div className="h-[210px] bg-surface-secondary border-t border-ui-border flex flex-col p-4 clay-shadow-sm">
           <p className="text-label-xs text-text-muted mb-3 uppercase tracking-widest">
             Attention Breakdown · Sentence {selectedSentenceIndex + 1}
           </p>
@@ -196,7 +196,7 @@ export function ImageViewer() {
           >
             {/* Original */}
             <div className="flex flex-col items-center gap-1.5">
-              <div className="flex-1 w-full bg-viewer-bg rounded border border-ui-border overflow-hidden relative">
+              <div className="flex-1 w-full bg-viewer-bg rounded-xl border border-ui-border overflow-hidden relative">
                 <img
                   src={`data:image/png;base64,${selectedImage}`}
                   alt="Original"
@@ -209,7 +209,7 @@ export function ImageViewer() {
             {/* Attention / Heatmap */}
             {(currentAttentionMap || currentHeatmapData) && (
               <div className="flex flex-col items-center gap-1.5">
-                <div className="flex-1 w-full bg-viewer-bg rounded border border-ui-border overflow-hidden relative">
+                <div className="flex-1 w-full bg-viewer-bg rounded-xl border border-ui-border overflow-hidden relative">
                   {currentAttentionMap ? (
                     <img
                       src={`data:image/png;base64,${currentAttentionMap}`}
@@ -226,7 +226,7 @@ export function ImageViewer() {
 
             {/* Overlay */}
             <div className="flex flex-col items-center gap-1.5">
-              <div className="flex-1 w-full bg-viewer-bg rounded border border-ui-border overflow-hidden relative">
+              <div className="flex-1 w-full bg-viewer-bg rounded-xl border border-ui-border overflow-hidden relative">
                 <img
                   src={`data:image/png;base64,${currentOverlay}`}
                   alt="Overlay"

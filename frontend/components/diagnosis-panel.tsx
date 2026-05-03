@@ -40,9 +40,9 @@ export function DiagnosisPanel() {
   if (isAnalyzing) {
     return (
       <div className="flex flex-col h-full bg-surface-primary border-r border-ui-border items-center justify-center p-8 text-center">
-        <div className="relative w-12 h-12 mb-5">
-          <div className="absolute inset-0 rounded-full border border-clinical-teal/20" />
-          <div className="absolute inset-0 rounded-full border border-t-clinical-teal border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+        <div className="relative w-14 h-14 mb-5">
+          <div className="absolute inset-0 rounded-full border-2 border-clinical-teal/20" />
+          <div className="absolute inset-0 rounded-full border-2 border-t-clinical-teal border-r-transparent border-b-transparent border-l-transparent animate-spin" />
         </div>
         <p className="text-sm font-semibold text-text-primary mb-1">
           Analyzing Pathology
@@ -57,8 +57,8 @@ export function DiagnosisPanel() {
   if (!analysis) {
     return (
       <div className="flex flex-col h-full bg-surface-primary border-r border-ui-border items-center justify-center p-8 text-center">
-        <div className="p-4 rounded-2xl border border-ui-border bg-surface-secondary mb-4">
-          <Activity size={24} className="text-text-muted opacity-30" />
+        <div className="p-4 rounded-3xl border border-ui-border bg-surface-secondary mb-4 clay-shadow-sm">
+          <Activity size={28} className="text-text-muted opacity-40" />
         </div>
         <p className="text-sm font-medium text-text-secondary">
           No Diagnosis Data
@@ -79,7 +79,7 @@ export function DiagnosisPanel() {
   return (
     <div className="flex flex-col h-full bg-surface-primary border-r border-ui-border overflow-auto scrollbar-thin font-body">
       {/* Header */}
-      <div className="sticky top-0 z-10 border-b border-ui-border px-5 py-4 bg-surface-secondary backdrop-blur">
+      <div className="sticky top-0 z-10 border-b border-ui-border px-5 py-4 bg-surface-secondary/80 backdrop-blur-md clay-shadow-sm">
         <p className="text-label-xs text-text-muted mb-0.5">
           AI Interpretation
         </p>
@@ -92,7 +92,7 @@ export function DiagnosisPanel() {
       <div className="flex-1 p-5 space-y-6">
         {/* Low Confidence Warning */}
         {topProb < 0.6 && (
-          <div className="flex items-start gap-3 p-3.5 rounded-lg bg-status-caution/8 border border-status-caution/25">
+          <div className="flex items-start gap-3 p-4 rounded-2xl bg-status-caution/8 border border-status-caution/25 clay-shadow-sm">
             <AlertCircle
               size={14}
               className="mt-0.5 flex-shrink-0 text-status-caution"
@@ -114,7 +114,7 @@ export function DiagnosisPanel() {
           <p className="text-label-xs text-text-muted mb-2.5 uppercase tracking-widest">
             Primary Finding
           </p>
-          <div className={`border rounded-xl p-5 ${getRiskBorder(topProb)}`}>
+          <div className={`border rounded-2xl p-5 clay-shadow-sm ${getRiskBorder(topProb)}`}>
             <div className="flex items-start justify-between mb-5">
               <h3 className="text-2xl font-bold text-text-primary leading-tight max-w-[68%] font-header">
                 {topPathology}
@@ -155,12 +155,12 @@ export function DiagnosisPanel() {
           </div>
         </div>
 
-        {/* 🔥 Reasoning */}
+        {/* Clinical Reasoning */}
         <div>
           <p className="text-label-xs text-text-muted mb-2.5 uppercase tracking-widest">
             Clinical Reasoning
           </p>
-          <div className="border border-ui-border rounded-xl p-4 bg-surface-secondary">
+          <div className="border border-ui-border rounded-2xl p-4 bg-surface-secondary clay-shadow-sm">
             <p className="text-sm text-text-secondary leading-relaxed">
               {analysis.reasoning || "No reasoning available"}
             </p>
@@ -175,7 +175,7 @@ export function DiagnosisPanel() {
             </p>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {analysis.sentences?.map((item, idx) => (
               <button
                 key={idx}
@@ -184,10 +184,10 @@ export function DiagnosisPanel() {
                     selectedSentenceIndex === idx ? null : idx,
                   )
                 }
-                className={`w-full text-left flex items-start gap-2.5 p-3 rounded-lg border text-sm transition-all ${
+                className={`w-full text-left flex items-start gap-2.5 p-3 rounded-2xl border text-sm transition-all clay-shadow-sm ${
                   selectedSentenceIndex === idx
-                    ? "border-clinical-teal/40 bg-clinical-teal/5 text-text-primary"
-                    : "border-transparent hover:border-ui-border hover:bg-surface-hover text-text-secondary"
+                    ? "border-clinical-teal/40 bg-clinical-teal/8 text-text-primary clay-shadow"
+                    : "border-ui-border hover:border-ui-border-hover hover:bg-surface-hover text-text-secondary"
                 }`}
               >
                 <span className="w-4.5 h-4.5 text-[10px] font-semibold flex items-center justify-center bg-surface-tertiary rounded">
@@ -218,13 +218,13 @@ export function DiagnosisPanel() {
                 );
               }
 
-              return [...pathologies] // 🔥 clone to avoid mutating original state
+              return [...pathologies]
                 .sort((a, b) => b.probability - a.probability)
                 .slice(0, 5)
                 .map((p) => (
                   <div
                     key={p.name}
-                    className="flex items-center justify-between py-2.5 px-3.5 rounded-lg border border-ui-border bg-surface-secondary hover:border-ui-border-hover transition-colors"
+                    className="flex items-center justify-between py-3 px-4 rounded-2xl border border-ui-border bg-surface-secondary hover:border-ui-border-hover transition-all clay-shadow-sm hover:clay-shadow"
                   >
                     <span className="text-[13px] text-text-secondary font-medium">
                       {p.name}

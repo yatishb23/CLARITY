@@ -60,7 +60,7 @@ export function ChatPanel() {
   return (
     <div className="flex flex-col h-full bg-surface-primary border-l border-ui-border font-body">
       {/* Header */}
-      <div className="border-b border-ui-border px-5 py-4 bg-surface-secondary">
+      <div className="border-b border-ui-border px-5 py-4 bg-surface-secondary/80 backdrop-blur-md clay-shadow-sm">
         <p className="text-label-xs text-text-muted mb-0.5">AI Assistant</p>
         <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
           <Bot size={14} className="text-clinical-teal" />
@@ -72,8 +72,8 @@ export function ChatPanel() {
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4 scrollbar-thin">
         {chatHistory.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4 pb-8">
-            <div className="p-4 rounded-2xl border border-ui-border bg-surface-secondary mb-4">
-              <MessageSquare size={22} className="text-text-muted opacity-30" />
+            <div className="p-4 rounded-3xl border border-ui-border bg-surface-secondary mb-4 clay-shadow-sm">
+              <MessageSquare size={24} className="text-text-muted opacity-40" />
             </div>
             <p className="text-[13px] font-medium text-text-secondary mb-1">
               {analysis ? "Ready for consultation" : "Upload an image first"}
@@ -95,25 +95,25 @@ export function ChatPanel() {
           >
             {/* Avatar */}
             <div
-              className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 border ${
+              className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 border clay-shadow-sm ${
                 message.role === "user"
                   ? "bg-surface-tertiary border-ui-border"
-                  : "bg-clinical-teal/10 border-clinical-teal/25"
+                  : "bg-clinical-teal/15 border-clinical-teal/30"
               }`}
             >
               {message.role === "user" ? (
-                <User size={11} className="text-text-secondary" />
+                <User size={12} className="text-text-secondary" />
               ) : (
-                <Bot size={11} className="text-clinical-teal" />
+                <Bot size={12} className="text-clinical-teal" />
               )}
             </div>
 
             {/* Bubble */}
             <div
-              className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
+              className={`max-w-[82%] rounded-3xl px-4 py-3 text-[13px] leading-relaxed clay-shadow-sm ${
                 message.role === "user"
-                  ? "bg-clinical-teal text-white rounded-br-sm"
-                  : "bg-surface-secondary border border-ui-border text-text-primary rounded-bl-sm"
+                  ? "bg-gradient-to-br from-clinical-teal to-clinical-teal-dark text-white rounded-br-none"
+                  : "bg-surface-secondary border border-ui-border text-text-primary rounded-bl-none"
               }`}
             >
               {message.content}
@@ -123,10 +123,10 @@ export function ChatPanel() {
 
         {isChatting && (
           <div className="flex items-end gap-2.5">
-            <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-clinical-teal/10 border border-clinical-teal/25">
-              <Bot size={11} className="text-clinical-teal" />
+            <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 bg-clinical-teal/15 border border-clinical-teal/30 clay-shadow-sm">
+              <Bot size={12} className="text-clinical-teal" />
             </div>
-            <div className="bg-surface-secondary border border-ui-border rounded-2xl rounded-bl-sm px-3.5 py-3">
+            <div className="bg-surface-secondary border border-ui-border rounded-3xl rounded-bl-none px-4 py-3 clay-shadow-sm">
               <Loader className="animate-spin text-text-muted" size={14} />
             </div>
           </div>
@@ -137,12 +137,12 @@ export function ChatPanel() {
 
       {/* Quick Prompts */}
       {analysis && chatHistory.length === 0 && (
-        <div className="px-5 pb-2 flex gap-1.5 overflow-x-auto scrollbar-hide">
+        <div className="px-5 pb-3 flex gap-2 overflow-x-auto scrollbar-hide">
           {QUICK_PROMPTS.map((txt) => (
             <button
               key={txt}
               onClick={() => handleSendMessage(txt)}
-              className="whitespace-nowrap text-[11px] font-medium px-2.5 py-1.5 rounded-md border border-ui-border bg-surface-secondary text-text-secondary hover:border-clinical-teal/40 hover:text-clinical-teal hover:bg-clinical-teal/5 transition-all"
+              className="whitespace-nowrap text-[11px] font-medium px-3 py-2 rounded-2xl border border-ui-border bg-surface-secondary text-text-secondary hover:border-clinical-teal/40 hover:text-clinical-teal hover:bg-clinical-teal/8 transition-all clay-shadow-sm"
             >
               {txt}
             </button>
@@ -151,8 +151,8 @@ export function ChatPanel() {
       )}
 
       {/* Input */}
-      <div className="px-5 py-4 border-t border-ui-border bg-surface-secondary">
-        <div className="flex items-center gap-2">
+      <div className="px-5 py-4 border-t border-ui-border bg-surface-secondary clay-shadow-sm">
+        <div className="flex items-center gap-2.5">
           <input
             type="text"
             value={inputValue}
@@ -162,15 +162,15 @@ export function ChatPanel() {
               analysis ? "Ask about the scan…" : "Upload image to begin"
             }
             disabled={!analysis || isChatting}
-            className="flex-1 bg-surface-primary border border-ui-border rounded-lg px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-clinical-teal/40 focus:border-clinical-teal/40 disabled:opacity-40 transition-all"
+            className="flex-1 bg-surface-primary border border-ui-border rounded-2xl px-4 py-2.5 text-[13px] text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-clinical-teal/40 focus:border-clinical-teal/40 disabled:opacity-40 transition-all clay-shadow-sm"
           />
           <button
             onClick={() => handleSendMessage()}
             disabled={!inputValue.trim() || !analysis || isChatting}
-            className="p-2.5 bg-clinical-teal text-white rounded-lg hover:bg-clinical-teal-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+            className="p-2.5 bg-gradient-to-br from-clinical-teal to-clinical-teal-dark text-white rounded-2xl hover:shadow-md transition-all disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0 clay-shadow-sm hover:clay-shadow"
             title="Send message"
           >
-            <Send size={15} />
+            <Send size={16} />
           </button>
         </div>
       </div>

@@ -18,62 +18,62 @@
 
 /* ── Light Mode Tokens ───────────────────────────────────── */
 :root {
-  /* Surfaces */
-  --surface-primary:   #f8f9fb;
-  --surface-secondary: #ffffff;
-  --surface-tertiary:  #eef0f4;
-  --surface-hover:     #f1f3f7;
+  /* Surfaces - Claymorphism: soft, rounded, tactile */
+  --surface-primary:   #faf8f6;
+  --surface-secondary: #f5f3f0;
+  --surface-tertiary:  #ede8e3;
+  --surface-hover:     #f0ebe5;
 
   /* Viewer (always dark — radiograph background) */
   --viewer-bg:         #0d0f11;
 
-  /* Borders */
-  --ui-border:         #e2e5ec;
-  --ui-border-hover:   #c8cdd8;
+  /* Borders - Soft, subtle */
+  --ui-border:         #e8dfd5;
+  --ui-border-hover:   #d9cdbf;
 
   /* Text */
-  --text-primary:      #111827;
-  --text-secondary:    #374151;
-  --text-muted:        #6b7280;
+  --text-primary:      #2a241f;
+  --text-secondary:    #5a4f48;
+  --text-muted:        #8b7f77;
 
-  /* Clinical accent */
-  --clinical-teal:      #0d9488;
-  --clinical-teal-dark: #0a7a70;
+  /* Clinical accent - Soft teal/sage */
+  --clinical-teal:      #6fa399;
+  --clinical-teal-dark: #5a8f86;
 
   /* Status */
-  --status-normal:    #16a34a;
-  --status-caution:   #d97706;
-  --status-critical:  #dc2626;
+  --status-normal:    #7fa864;
+  --status-caution:   #c9a868;
+  --status-critical:  #c97777;
 }
 
 /* ── Dark Mode Tokens ────────────────────────────────────── */
 .dark {
-  /* Surfaces */
-  --surface-primary:   #0f1117;
-  --surface-secondary: #161a22;
-  --surface-tertiary:  #1e2433;
-  --surface-hover:     #1a1f2c;
+  /* Surfaces - Claymorphism: warm, soft dark */
+  --surface-primary:   #1a1410;
+  --surface-secondary: #24201a;
+  --surface-tertiary:  #2d2620;
+  --surface-hover:     #2a2318;
 
   /* Viewer */
   --viewer-bg:         #080a0d;
 
-  /* Borders */
-  --ui-border:         #252b38;
-  --ui-border-hover:   #323a4c;
+  /* Borders - Warm, soft */
+  --ui-border:         #3d3530;
+  --ui-border-hover:   #4a3f38;
 
   /* Text */
-  --text-primary:      #f1f5f9;
-  --text-secondary:    #94a3b8;
-  --text-muted:        #64748b;
+  --text-primary:      #f5f0eb;
+  --text-secondary:    #c5b8ae;
+  --text-muted:        #8b8078;
 
-  /* Clinical accent */
-  --clinical-teal:      #2dd4bf;
-  --clinical-teal-dark: #14b8a6;
+  /* Clinical accent - Warm sage */
+  --clinical-teal:      #9bbfb1;
+  --clinical-teal-dark: #88a699;
 
   /* Status */
-  --status-normal:    #4ade80;
-  --status-caution:   #fbbf24;
-  --status-critical:  #f87171;
+  --status-normal:    #a4c488;
+  --status-caution:   #dbb584;
+  --status-critical:  #d9a0a0;
 }
 
 /* ── Base ───────────────────────────────────────────────── */
@@ -133,5 +133,56 @@
     background: rgba(0,0,0,0.55);
     border: 1px solid rgba(255,255,255,0.08);
     backdrop-filter: blur(8px);
+  }
+
+  /* Claymorphism shadows */
+  .clay-shadow-sm {
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.04),
+      0 4px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .clay-shadow {
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.06),
+      0 8px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .clay-shadow-lg {
+    box-shadow: 
+      0 8px 24px rgba(0, 0, 0, 0.08),
+      0 16px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Claymorphic card/panel - soft rounded with subtle shadow */
+  .clay-panel {
+    background: var(--surface-secondary);
+    border: 1px solid var(--ui-border);
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .clay-panel:hover {
+    border-color: var(--ui-border-hover);
+    box-shadow: 
+      0 6px 16px rgba(0, 0, 0, 0.07),
+      0 12px 24px rgba(0, 0, 0, 0.09);
+    transform: translateY(-1px);
+  }
+
+  /* Claymorphic button */
+  .clay-button {
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+      0 2px 6px rgba(0, 0, 0, 0.05),
+      0 4px 12px rgba(0, 0, 0, 0.07);
+  }
+
+  .clay-button:hover {
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      0 8px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
 }
