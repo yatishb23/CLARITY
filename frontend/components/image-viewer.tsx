@@ -9,6 +9,7 @@ export function ImageViewer() {
   const [scale, setScale] = useState(1);
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [heatmapOpacity, setHeatmapOpacity] = useState(0.6);
+
   const {
     selectedImage,
     currentOverlay,
@@ -38,31 +39,49 @@ export function ImageViewer() {
     : "Activation Map";
 
   return (
-    <div className="flex flex-col h-full bg-surface-primary border-r border-ui-border font-body">
+    <div className="flex flex-col h-full 
+                    bg-neutral-50 dark:bg-neutral-950 
+                    border-r border-neutral-200 dark:border-neutral-800">
+
       {/* Header */}
-      <div className="border-b border-ui-border px-5 py-3.5 bg-surface-secondary">
+      <div className="border-b border-neutral-200 dark:border-neutral-800 
+                      px-5 py-3.5 
+                      bg-neutral-100 dark:bg-neutral-900">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-label-xs text-text-muted mb-0.5">Imaging Modality</p>
-            <h3 className="text-sm font-semibold text-text-primary tracking-tight">
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mb-0.5">
+              Imaging Modality
+            </p>
+            <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
               Chest Radiograph · AP View
             </h3>
           </div>
-          <div className="flex items-center gap-1 bg-surface-primary border border-ui-border rounded-md px-1.5 py-1">
+
+          <div className="flex items-center gap-1 
+                          bg-neutral-50 dark:bg-neutral-950 
+                          border border-neutral-200 dark:border-neutral-800 
+                          rounded-md px-1.5 py-1">
             <button
               onClick={() => handleZoom("out")}
-              className="p-1 hover:bg-surface-hover rounded text-text-secondary hover:text-text-primary transition-colors"
-              title="Zoom out"
+              className="p-1 rounded 
+                         text-neutral-500 dark:text-neutral-400 
+                         hover:bg-neutral-200 dark:hover:bg-neutral-800 
+                         hover:text-neutral-800 dark:hover:text-neutral-200"
             >
               <ZoomOut size={13} />
             </button>
-            <span className="text-[11px] font-mono font-semibold w-9 text-center text-text-primary tabular-nums">
+
+            <span className="text-[11px] font-mono font-semibold w-9 text-center 
+                             text-neutral-800 dark:text-neutral-200">
               {Math.round(scale * 100)}%
             </span>
+
             <button
               onClick={() => handleZoom("in")}
-              className="p-1 hover:bg-surface-hover rounded text-text-secondary hover:text-text-primary transition-colors"
-              title="Zoom in"
+              className="p-1 rounded 
+                         text-neutral-500 dark:text-neutral-400 
+                         hover:bg-neutral-200 dark:hover:bg-neutral-800 
+                         hover:text-neutral-800 dark:hover:text-neutral-200"
             >
               <ZoomIn size={13} />
             </button>
@@ -70,34 +89,47 @@ export function ImageViewer() {
         </div>
       </div>
 
-      {/* Layer Controls */}
-      <div className="border-b border-ui-border px-5 py-3 bg-surface-secondary flex items-center gap-6">
+      {/* Controls */}
+      <div className="border-b border-neutral-200 dark:border-neutral-800 
+                      px-5 py-3 
+                      bg-neutral-100 dark:bg-neutral-900 
+                      flex items-center gap-6">
+
         {/* Toggle */}
-        <label className="flex items-center gap-2.5 cursor-pointer select-none group">
-          <div className="relative flex h-5 w-9 items-center flex-shrink-0">
+        <label className="flex items-center gap-2.5 cursor-pointer group">
+          <div className="relative flex h-5 w-9 items-center">
             <input
               type="checkbox"
               checked={showHeatmap}
               onChange={(e) => setShowHeatmap(e.target.checked)}
               className="peer sr-only"
             />
-            <div className="h-[18px] w-9 rounded-full bg-ui-border transition-colors peer-checked:bg-clinical-teal" />
-            <div className="absolute left-0.5 h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-[18px]" />
+            <div className="h-[18px] w-9 rounded-full 
+                            bg-neutral-300 dark:bg-neutral-700 
+                            peer-checked:bg-teal-500" />
+            <div className="absolute left-0.5 h-3.5 w-3.5 rounded-full 
+                            bg-white shadow-sm 
+                            transition-transform 
+                            peer-checked:translate-x-[18px]" />
           </div>
+
           <div className="flex items-center gap-1.5">
-            <Layers size={11} className="text-text-muted" />
-            <span className="text-label-xs text-text-secondary group-hover:text-text-primary transition-colors">
+            <Layers size={11} className="text-neutral-500" />
+            <span className="text-[11px] 
+                             text-neutral-600 dark:text-neutral-400 
+                             group-hover:text-neutral-900 dark:group-hover:text-neutral-200">
               {overlayLabel}
             </span>
           </div>
         </label>
 
-        {/* Opacity Slider */}
+        {/* Opacity */}
         {showHeatmap && currentOverlay && (
           <div className="flex items-center gap-3 flex-1 max-w-[200px]">
-            <span className="text-label-xs text-text-muted whitespace-nowrap">
+            <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
               Intensity
             </span>
+
             <input
               type="range"
               min="0"
@@ -105,10 +137,14 @@ export function ImageViewer() {
               step="0.05"
               value={heatmapOpacity}
               onChange={(e) => setHeatmapOpacity(parseFloat(e.target.value))}
-              className="flex-1 h-[3px] appearance-none rounded-full cursor-pointer
-                         bg-ui-border accent-clinical-teal"
+              className="flex-1 h-[3px] appearance-none rounded-full 
+                         cursor-pointer 
+                         bg-neutral-300 dark:bg-neutral-700 
+                         accent-teal-500"
             />
-            <span className="text-label-xs text-text-muted tabular-nums w-7 text-right">
+
+            <span className="text-[11px] w-7 text-right 
+                             text-neutral-500 dark:text-neutral-400">
               {Math.round(heatmapOpacity * 100)}%
             </span>
           </div>
@@ -116,10 +152,12 @@ export function ImageViewer() {
       </div>
 
       {/* Viewport */}
-      <div className="flex-1 overflow-hidden relative flex items-center justify-center p-6 bg-viewer-bg">
-        {/* Subtle dot-grid */}
+      <div className="flex-1 overflow-hidden relative flex items-center justify-center p-6 
+                     bg-neutral-900">
+
+        {/* Grid */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.04]"
+          className="absolute inset-0 opacity-[0.04]"
           style={{
             backgroundImage: "radial-gradient(circle, #94a3b8 1px, transparent 0)",
             backgroundSize: "20px 20px",
@@ -127,23 +165,15 @@ export function ImageViewer() {
         />
 
         {isAnalyzing ? (
-          <div className="relative z-10 flex flex-col items-center gap-5">
-            <div className="relative w-14 h-14">
-              <div className="absolute inset-0 rounded-full border border-clinical-teal/20" />
-              <div className="absolute inset-0 rounded-full border border-t-clinical-teal border-r-transparent border-b-transparent border-l-transparent animate-spin" />
-            </div>
-            <div className="text-center">
-              <p className="text-xs font-semibold text-text-secondary uppercase tracking-widest mb-1.5 animate-pulse">
-                Processing
-              </p>
-              <p className="text-[11px] text-text-muted max-w-[180px] leading-relaxed">
-                Computing attention weights across spatial domain…
-              </p>
-            </div>
+          <div className="flex flex-col items-center gap-5">
+            <div className="w-14 h-14 border border-teal-500 border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs text-neutral-400">
+              Processing...
+            </p>
           </div>
         ) : selectedImage ? (
           <div
-            className="relative transition-transform duration-300 ease-out"
+            className="relative transition-transform duration-300"
             style={{
               height: "85%",
               aspectRatio: "1 / 1",
@@ -152,89 +182,54 @@ export function ImageViewer() {
           >
             <img
               src={`data:image/png;base64,${selectedImage}`}
-              alt="Chest X-Ray"
-              className="w-full h-full object-contain rounded shadow-[0_0_40px_rgba(0,0,0,0.6)]"
+              className="w-full h-full object-contain rounded shadow-xl"
             />
 
             {currentOverlay && (
               <img
                 src={`data:image/png;base64,${currentOverlay}`}
-                alt="Heatmap Overlay"
-                className="absolute inset-0 w-full h-full object-contain rounded pointer-events-none transition-opacity duration-300"
+                className="absolute inset-0 w-full h-full object-contain rounded"
                 style={{ opacity: showHeatmap ? heatmapOpacity : 0 }}
               />
             )}
 
-            {/* DICOM metadata badge */}
             <div className="absolute bottom-3 left-3 flex gap-1.5">
-              <span className="viewer-badge">512 × 512</span>
-              <span className="viewer-badge">DICOM</span>
+              <span className="text-xs px-2 py-1 rounded 
+                              bg-neutral-800 
+                              text-neutral-300">
+                512 × 512
+              </span>
+              <span className="text-xs px-2 py-1 rounded 
+                               bg-neutral-800 
+                               text-neutral-300">
+                DICOM
+              </span>
             </div>
           </div>
         ) : (
-          <div className="relative z-10 flex flex-col items-center gap-3 text-text-muted">
-            <div className="p-5 rounded-2xl border border-ui-border bg-surface-secondary">
-              <Maximize2 size={28} className="opacity-20" />
-            </div>
-            <p className="text-label-xs text-text-muted">
-              Awaiting image upload
-            </p>
+          <div className="flex flex-col items-center gap-3 text-neutral-500">
+            <Maximize2 size={28} className="opacity-20" />
+            <p className="text-xs">Awaiting image upload</p>
           </div>
         )}
       </div>
 
-      {/* Sentence Attention Detail */}
+      {/* Bottom Panel */}
       {selectedSentenceIndex !== null && currentOverlay && (
-        <div className="h-[210px] bg-surface-secondary border-t border-ui-border flex flex-col p-4">
-          <p className="text-label-xs text-text-muted mb-3 uppercase tracking-widest">
+        <div className="h-[210px] 
+                      bg-neutral-900 
+                        border-t border-neutral-800 
+                        p-4">
+          <p className="text-xs text-neutral-400 mb-3">
             Attention Breakdown · Sentence {selectedSentenceIndex + 1}
           </p>
-          <div
-            className={`flex-1 grid ${
-              currentAttentionMap || currentHeatmapData ? "grid-cols-3" : "grid-cols-2"
-            } gap-4`}
-          >
-            {/* Original */}
-            <div className="flex flex-col items-center gap-1.5">
-              <div className="flex-1 w-full bg-viewer-bg rounded border border-ui-border overflow-hidden relative">
-                <img
-                  src={`data:image/png;base64,${selectedImage}`}
-                  alt="Original"
-                  className="absolute inset-0 w-full h-full object-contain"
-                />
-              </div>
-              <span className="text-label-xs text-text-muted">Original</span>
-            </div>
 
-            {/* Attention / Heatmap */}
-            {(currentAttentionMap || currentHeatmapData) && (
-              <div className="flex flex-col items-center gap-1.5">
-                <div className="flex-1 w-full bg-viewer-bg rounded border border-ui-border overflow-hidden relative">
-                  {currentAttentionMap ? (
-                    <img
-                      src={`data:image/png;base64,${currentAttentionMap}`}
-                      alt="Attention Map"
-                      className="absolute inset-0 w-full h-full object-contain"
-                    />
-                  ) : currentHeatmapData ? (
-                    <HeatmapCanvas data={currentHeatmapData} />
-                  ) : null}
-                </div>
-                <span className="text-label-xs text-text-muted">Attention Map</span>
-              </div>
+          <div className="grid grid-cols-3 gap-4 h-full">
+            <img src={`data:image/png;base64,${selectedImage}`} className="object-contain" />
+            {currentAttentionMap && (
+              <img src={`data:image/png;base64,${currentAttentionMap}`} className="object-contain" />
             )}
-
-            {/* Overlay */}
-            <div className="flex flex-col items-center gap-1.5">
-              <div className="flex-1 w-full bg-viewer-bg rounded border border-ui-border overflow-hidden relative">
-                <img
-                  src={`data:image/png;base64,${currentOverlay}`}
-                  alt="Overlay"
-                  className="absolute inset-0 w-full h-full object-contain"
-                />
-              </div>
-              <span className="text-label-xs text-text-muted">Overlay</span>
-            </div>
+            <img src={`data:image/png;base64,${currentOverlay}`} className="object-contain" />
           </div>
         </div>
       )}

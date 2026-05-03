@@ -4,25 +4,19 @@ import {
   Settings,
   User,
   Upload,
-  Moon,
-  Sun,
   Loader2,
   Activity,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useRef } from "react";
 import { useClarityStore } from "@/lib/store";
 import axios from "axios";
-import { useTheme } from "next-themes";
+
+/* Simple dark toggle (no next-themes) */
+import { ModeToggle } from "@/components/ModeToggle";
 
 export function Navbar() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { setAnalysis, setAnalyzing, isAnalyzing } = useClarityStore();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -42,26 +36,32 @@ export function Navbar() {
       const response = await axios.post("/api/analyze", formData);
       setAnalysis(response.data);
     } catch (error) {
-      console.error("Failed to analyze image:", error);
-      alert("Failed to analyze image. Please try again.");
+      alert("Failed to analyze image.");
     } finally {
       setAnalyzing(false);
     }
   };
 
   return (
-    <div className="sticky top-0 z-50 border-b border-ui-border bg-surface-secondary font-body">
+    <div className="sticky top-0 z-50 
+                    bg-neutral-100 dark:bg-neutral-900 
+                    border-b border-neutral-200 dark:border-neutral-800">
+
       <div className="flex items-center justify-between px-6 py-3">
-        {/* Wordmark */}
+
+        {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-clinical-teal/10 border border-clinical-teal/20">
-            <Activity size={16} className="text-clinical-teal" />
+          <div className="w-8 h-8 flex items-center justify-center rounded-lg 
+                          bg-teal-500/10 border border-teal-500/20">
+            <Activity size={16} className="text-teal-500" />
           </div>
+
           <div>
-            <h1 className="text-[15px] font-bold tracking-[0.12em] text-text-primary font-body leading-none uppercase">
+            <h1 className="text-[15px] font-bold tracking-wider uppercase
+                           text-neutral-800 dark:text-neutral-200">
               Clarity
             </h1>
-            <p className="text-label-xs mt-0.5">
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
               Clinical Decision Support
             </p>
           </div>
@@ -69,6 +69,7 @@ export function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+
           <input
             type="file"
             ref={fileInputRef}
@@ -77,44 +78,48 @@ export function Navbar() {
             accept="image/*"
           />
 
-          {/* Primary CTA */}
+          {/* Upload */}
           <button
             onClick={handleUploadClick}
             disabled={isAnalyzing}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 dark:bg-clinical-teal hover:bg-clinical-teal-dark text-white text-[13px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg 
+                       bg-teal-500 hover:bg-teal-600 
+                       text-white text-[13px] font-semibold
+                       disabled:opacity-50"
           >
             {isAnalyzing ? (
-              <Loader2 className="animate-spin flex-shrink-0" size={14} />
+              <Loader2 className="animate-spin" size={14} />
             ) : (
-              <Upload size={14} className="flex-shrink-0" />
+              <Upload size={14} />
             )}
             {isAnalyzing ? "Analyzing…" : "Analyze Scan"}
           </button>
 
           {/* Divider */}
-          <div className="w-px h-5 bg-ui-border mx-1" />
+          <div className="w-px h-5 
+                          bg-neutral-200 dark:bg-neutral-800 mx-1" />
 
-          {/* Icon actions */}
-          {mounted && (
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-hover border border-transparent hover:border-ui-border transition-all"
-              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            >
-              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-          )}
+          {/* Theme toggle */}
+          <ModeToggle />
 
+          {/* Settings */}
           <button
-            className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-hover border border-transparent hover:border-ui-border transition-all"
-            title="Settings"
+            className="p-2 rounded-lg border border-transparent
+                       text-neutral-500 dark:text-neutral-400
+                       hover:text-neutral-900 dark:hover:text-neutral-200
+                       hover:bg-neutral-200 dark:hover:bg-neutral-800
+                       hover:border-neutral-200 dark:hover:border-neutral-700 transition"
           >
             <Settings size={16} />
           </button>
 
+          {/* User */}
           <button
-            className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-hover border border-transparent hover:border-ui-border transition-all"
-            title="Account"
+            className="p-2 rounded-lg border border-transparent
+                       text-neutral-500 dark:text-neutral-400
+                       hover:text-neutral-900 dark:hover:text-neutral-200
+                       hover:bg-neutral-200 dark:hover:bg-neutral-800
+                       hover:border-neutral-200 dark:hover:border-neutral-700 transition"
           >
             <User size={16} />
           </button>
