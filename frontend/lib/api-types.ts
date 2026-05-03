@@ -14,6 +14,7 @@ export interface SentenceAttention {
   sentence_text: string;
   overlay_image_b64: string;
   heatmap_data?: number[][];
+  confidence?: number;
 }
 
 export interface AnalyzeResponse {
@@ -27,6 +28,9 @@ export interface AnalyzeResponse {
   metadata?: {
     model_id: string;
   };
+  confidence?: number;
+  impression?: string;
+  reasoning?: string;
 }
 
 export interface ChatMessage {
