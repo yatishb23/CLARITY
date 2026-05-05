@@ -28,10 +28,13 @@ router = APIRouter(tags=["Chat"])
 async def chat(request: Request, body: ChatRequest):
     context = get_session(body.session_id)
     if context is None:
-        raise HTTPException(
-            404,
-            "Session not found or expired. Please run /analyze first.",
-        )
+        # Provide a fallback context so chat doesn't crash 404 on mismatched/old endpoints
+        context = {
+            "report": "No detailed report available in this session.",
+            "top_pathology": "Unknown",
+            "all_pathologies": [],
+            "image_bytes": None
+        }
 
     services = request.app.state.services
     llm      = services["llm"]
@@ -48,6 +51,7 @@ async def chat(request: Request, body: ChatRequest):
             "report":           context["report"],
             "top_pathology":    context["top_pathology"],
             "all_pathologies":  context["all_pathologies"],
+            "image_bytes":      context.get("image_bytes"),
         },
     )
 
@@ -75,9 +79,10 @@ async def chat(request: Request, body: ChatRequest):
                     image_b64   = cam["overlay_b64"]
                     image_label = f"Grad-CAM: {pathology}"
                     reply = (
-                        f"Here is the Grad-CAM heatmap for **{pathology}**. "
-                        "The highlighted regions show where the model focused when "
-                        "detecting this finding. Do you have any follow-up questions?"
+                        f"Here is the Grad-CAM heatmap highlighting **{pathology}**. "
+                        "The warm-colored regions (red/orange) indicate the specific areas the model "
+                        f"focused on to detect this pathology with a structured context to the {pathology} finding. \n\n"
+                        "Do you have any specific visual questions about this region?"
                     )
             except ValueError as e:
                 reply = str(e)

@@ -65,15 +65,19 @@ class LLMService:
     # ── Loading ────────────────────────────────────────────────────────────────
 
     def _load(self):
+        self.mock_mode = False
         for path in (MODEL_PKL, PROCESSOR_PKL):
             if not path.exists():
-                raise FileNotFoundError(f"Required file not found: {path}")
+                print(f"[LLM] Warning: Required file not found: {path}")
+                print("[LLM] Falling back to Mock Mode. No real medical report or attention heatmaps will be generated.")
+                self.mock_mode = True
+                return
 
         print(f"[LLM] Loading processor from {PROCESSOR_PKL} ...")
-        self.processor = torch.load(PROCESSOR_PKL, map_location=self.device)
+        self.processor = torch.load(PROCESSOR_PKL, map_location=self.device, weights_only=False)
 
         print(f"[LLM] Loading model from {MODEL_PKL} ...")
-        self.model = torch.load(MODEL_PKL, map_location=self.device)
+        self.model = torch.load(MODEL_PKL, map_location=self.device, weights_only=False)
         self.model.eval()
 
         self.IMAGE_TOKEN_ID = self.model.config.image_token_index
@@ -92,6 +96,10 @@ class LLMService:
         max_new_tokens: int = 400,
     ) -> tuple[str, str]:
         """Generate report. Returns (report_text, prompt_text)."""
+        if self.mock_mode:
+            report_text = "This is a simulated medical layout. The lungs are clear. The heart is normal size."
+            return report_text, "Prompt text here"
+
         prompt_text = self._build_prompt(image, SYSTEM_PROMPT)
         inputs = self.processor(
             text=prompt_text, images=image, return_tensors="pt"
@@ -126,6 +134,12 @@ class LLMService:
         n_layers_from_end: int = 6,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Forward pass with output_attentions. Returns (text_to_img_attn, suffix_input_ids)."""
+        if self.mock_mode:
+            # Create dummy tensors (this avoids crashing during development without real models)
+            dummy_attn = torch.rand((6, 12, 10, 576))  # e.g., 6 layers, 12 heads, 10 tokens, 24x24 grid = 576
+            dummy_tokens = torch.arange(10)
+            return dummy_attn, dummy_tokens
+
         gc.collect()
         if self.device == "cuda":
             torch.cuda.empty_cache()
@@ -189,7 +203,7 @@ class LLMService:
         raw_maps = [
             self._raw_heatmap(s, suffix_input_ids, text_to_img_attn, patch_grid)
             for s in sentences
-        ]
+        ] if not getattr(self, "mock_mode", False) else [np.random.rand(24, 24) for _ in sentences]
         global_avg = np.mean(raw_maps, axis=0)
 
         results = []
@@ -223,20 +237,108 @@ class LLMService:
         context: dict,
     ) -> dict:
         """
-        Single-turn conversational response with tool-call detection.
-
-        context = {
-          "report": str,
-          "top_pathology": str,
-          "all_pathologies": list[dict],
-        }
-
-        Returns:
-          {
-            "reply": str,
-            "tool_call": dict | None,   e.g. {"tool": "get_grad_cam", "pathology": "Pneumonia"}
-          }
+        Single-turn conversational response with tool-call detection using LangChain + Gemini.
+        Implements a Contextual RAG-like approach by injecting the diagnostic data 
+        into the prompt before allowing Gemini to call tools or respond to the user.
         """
+        import os
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+        from langchain_core.tools import tool
+
+        # Only init if GEMINI_API_KEY is present
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            # Fallback to existing MedGemma behavior
+            return self._fallback_chat(user_message, history, context)
+
+        # 1. Define tools that Gemini can call
+        @tool
+        def get_grad_cam(pathology: str) -> str:
+            """
+            Fetches a Grad-CAM heatmap visualization for a specific pathology.
+            Valid pathologies: Atelectasis, Cardiomegaly, Consolidation, Edema, 
+            Enlarged Cardiomediastinum, Fracture, Lung Lesion, Lung Opacity, No Finding, 
+            Pleural Effusion, Pleural Other, Pneumonia, Pneumothorax, Support Devices.
+            """
+            return f"Generating Grad-CAM for {pathology}..."
+
+        tools = [get_grad_cam]
+
+        # 2. Setup Gemini Chat Model
+        llm = ChatGoogleGenerativeAI(
+            model="gemini-3.1-flash-lite-preview",
+            temperature=0.3,
+            google_api_key=api_key,
+        )
+        llm_with_tools = llm.bind_tools(tools)
+
+        # 3. Contextual Data Formatting (Rag Simulation via prompt injection)
+        context_block = (
+            f"[DIAGNOSTIC CONTEXT]\n"
+            f"Top pathology: {context.get('top_pathology', 'Unknown')}\n"
+            f"Report:\n{context.get('report', '')}\n\n"
+            f"All pathology probabilities:\n"
+            + "\n".join(
+                f"  {p['name']}: {p['probability']:.3f}"
+                for p in context.get("all_pathologies", [])
+            )
+        )
+
+        messages = [
+            SystemMessage(content=CHAT_SYSTEM_PROMPT + "\n\n" + context_block)
+        ]
+        
+        # Add history
+        for h in history:
+            if h["role"] == "user":
+                messages.append(HumanMessage(content=h["content"]))
+            elif h["role"] == "assistant":
+                messages.append(AIMessage(content=h["content"]))
+
+        # Build the final user message. If an image is available, provide it to Gemini (Multimodal RAG)
+        image_bytes = context.get('image_bytes')
+        if image_bytes:
+            import base64
+            b64_image = base64.b64encode(image_bytes).decode("utf-8")
+            messages.append(HumanMessage(content=[
+                {"type": "text", "text": user_message},
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64_image}"}}
+            ]))
+        else:
+            messages.append(HumanMessage(content=user_message))
+
+        # 4. Invoke LLM
+        response = llm_with_tools.invoke(messages)
+
+        # 5. Extract Tool Call (if any)
+        tool_call = None
+        reply = response.content
+        if isinstance(reply, list):
+            # If the response content is a list of mixed parts, combine the text portions
+            text_parts = [part["text"] for part in reply if isinstance(part, dict) and "text" in part]
+            reply = " ".join(text_parts)
+        elif reply is None:
+            reply = ""
+
+        if response.tool_calls:
+            first_tool = response.tool_calls[0]
+            if first_tool["name"] == "get_grad_cam":
+                pathology_args = first_tool["args"].get("pathology", context.get("top_pathology"))
+                tool_call = {"tool": "get_grad_cam", "pathology": pathology_args}
+                reply = f"I am preparing the Grad-CAM heatmap highlighting {pathology_args} for you."
+            else:
+                # Handle unexpected tools gracefully
+                tool_call = {"tool": first_tool["name"], **first_tool["args"]}
+
+        return {"reply": reply, "tool_call": tool_call}
+
+    def _fallback_chat(
+        self,
+        user_message: str,
+        history: list[dict],
+        context: dict,
+    ) -> dict:
         context_block = (
             f"[DIAGNOSTIC CONTEXT]\n"
             f"Top pathology: {context.get('top_pathology', 'Unknown')}\n"

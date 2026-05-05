@@ -15,6 +15,6 @@ if __name__ == "__main__":
         "app.main:app",
         host="0.0.0.0",
         port=8000,
-        reload=False,     # set True during development (reloads on file save)
+        reload=True,     # set True during development (reloads on file save)
         log_level="info",
     )

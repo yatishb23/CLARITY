@@ -9,9 +9,18 @@ interface HeatmapCanvasProps {
 function getJetColor(value: number): [number, number, number, number] {
   const v = Math.max(0, Math.min(1, value));
   const fourValue = 4 * v;
-  const r = Math.min(Math.max(Math.min(fourValue - 1.5, -fourValue + 4.5), 0), 1);
-  const g = Math.min(Math.max(Math.min(fourValue - 0.5, -fourValue + 3.5), 0), 1);
-  const b = Math.min(Math.max(Math.min(fourValue + 0.5, -fourValue + 2.5), 0), 1);
+  const r = Math.min(
+    Math.max(Math.min(fourValue - 1.5, -fourValue + 4.5), 0),
+    1,
+  );
+  const g = Math.min(
+    Math.max(Math.min(fourValue - 0.5, -fourValue + 3.5), 0),
+    1,
+  );
+  const b = Math.min(
+    Math.max(Math.min(fourValue + 0.5, -fourValue + 2.5), 0),
+    1,
+  );
   return [r * 255, g * 255, b * 255, 220];
 }
 
@@ -49,7 +58,7 @@ export function HeatmapCanvas({ data }: HeatmapCanvasProps) {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full object-contain"
+      className="absolute inset-0 w-full h-full object-contain rounded-sm mix-blend-multiply dark:mix-blend-screen"
     />
   );
 }
