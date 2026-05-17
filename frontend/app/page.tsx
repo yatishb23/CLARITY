@@ -1,29 +1,32 @@
 import { Navbar } from "@/components/navbar";
 import { ImageViewer } from "@/components/image-viewer";
-import { DiagnosisPanel } from "@/components/diagnosis-panel";
-import { ChatPanel } from "@/components/chat-panel";
+import { ReportView } from "@/components/report-view";
+import { ChatBox } from "@/components/chat-box";
 
 export default function Home() {
   return (
-    <main className="h-screen flex flex-col bg-background">
-      {/* Navbar */}
+    <main className="relative flex h-screen flex-col overflow-hidden" style={{ background: "var(--color-bg)" }}>
+      {/* Ambient background glow */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: "var(--gradient-glow)" }}
+      />
+
       <Navbar />
 
-      {/* Main Workspace - 3 Panel System */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-x-hidden overflow-y-auto lg:overflow-hidden gap-0">
-        {/* Left Panel - Image Viewer (40%) */}
-        <div className="w-full lg:flex-1 flex flex-col min-w-0 h-[60vh] lg:h-full shrink-0">
+      {/* Two-panel workspace */}
+      <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row">
+        {/* Left — Image viewer (55%) */}
+        <div className="h-[50vh] w-full shrink-0 lg:h-full lg:w-[55%]">
           <ImageViewer />
         </div>
 
-        {/* Center Panel - AI Diagnosis (30%) */}
-        <div className="w-full lg:w-[30%] flex flex-col min-w-0 h-auto lg:h-full shrink-0 border-t lg:border-t-0 border-neutral-200 dark:border-neutral-800">
-          <DiagnosisPanel />
-        </div>
-
-        {/* Right Panel - Chat Assistant (30%) */}
-        <div className="w-full lg:w-[30%] flex flex-col min-w-0 h-[60vh] lg:h-full shrink-0 border-t lg:border-t-0 border-neutral-200 dark:border-neutral-800">
-          <ChatPanel />
+        {/* Right — Report (45%) + Chat */}
+        <div className="flex min-h-0 w-full flex-1 flex-col lg:h-full">
+          <div className="min-h-0 flex-1">
+            <ReportView />
+          </div>
+          <ChatBox />
         </div>
       </div>
     </main>

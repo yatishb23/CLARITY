@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Roboto_Flex } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
@@ -42,14 +43,15 @@ export default function RootLayout({
       className={`${inter.variable} ${roboto.variable}`}
       suppressHydrationWarning
     >
-      <body className="font-sans antialiased bg-background text-foreground selection:bg-primary/20">
+      <body className="font-sans antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
           {children}
+          <Toaster richColors position="bottom-right" />
         </ThemeProvider>
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>

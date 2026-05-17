@@ -1,33 +1,33 @@
 "use client"
 
 import { Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
 
 export function ModeToggle() {
+  const { setTheme, resolvedTheme } = useTheme()
+
   const toggleTheme = () => {
-    document.documentElement.classList.toggle("dark")
+    setTheme(resolvedTheme === "dark" ? "light" : "dark")
   }
 
   return (
     <button
       onClick={toggleTheme}
-      className="relative p-2 rounded-lg border 
-                 border-neutral-200 dark:border-neutral-800
-                 bg-neutral-100 dark:bg-neutral-900
-                 hover:bg-neutral-200 dark:hover:bg-neutral-800
-                 transition"
+      className="relative p-2 rounded-lg transition-all duration-200"
+      style={{
+        border: "1px solid var(--color-border)",
+        background: "var(--color-surface-dim)",
+      }}
     >
       {/* Sun */}
-      <Sun className="h-[1.2rem] w-[1.2rem] 
-                      text-neutral-700 
-                      dark:opacity-0 dark:scale-0 
-                      transition-all" />
+      <Sun className="h-[1.1rem] w-[1.1rem] dark:opacity-0 dark:scale-0 transition-all"
+        style={{ color: "var(--color-text-dim)" }}
+      />
 
       {/* Moon */}
-      <Moon className="absolute inset-0 m-auto h-[1.2rem] w-[1.2rem] 
-                       text-neutral-300 
-                       opacity-0 scale-0 
-                       dark:opacity-100 dark:scale-100 
-                       transition-all" />
+      <Moon className="absolute inset-0 m-auto h-[1.1rem] w-[1.1rem] opacity-0 scale-0 dark:opacity-100 dark:scale-100 transition-all"
+        style={{ color: "var(--color-accent)" }}
+      />
 
       <span className="sr-only">Toggle theme</span>
     </button>

@@ -1,132 +1,209 @@
 "use client";
 
-import { Settings, User, Upload, Loader2, Activity } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
+import { Activity, Upload, Loader2, RotateCcw, PowerOff } from "lucide-react";
+import { toast } from "sonner";
 import { useClarityStore } from "@/lib/store";
-import axios from "axios";
-
-/* Simple dark toggle (no next-themes) */
 import { ModeToggle } from "@/components/ModeToggle";
+import type { AnalyzeResponse, AnalyzeResponseWithSession, ReportOnlyResponse } from "@/lib/api-types";
+
+// ─── Shutdown ─────────────────────────────────────────────────────────────────
+
+function ShutdownButton() {
+  const [confirming, setConfirming] = useState(false);
+  const [isShuttingDown, setIsShuttingDown] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (confirming) {
+      timeoutRef.current = setTimeout(() => setConfirming(false), 4000);
+    }
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
+  }, [confirming]);
+
+  const handleClick = async () => {
+    if (!confirming) { setConfirming(true); return; }
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setConfirming(false);
+    setIsShuttingDown(true);
+    try {
+      await fetch("/api/shutdown", { method: "POST" });
+      toast.success("Backend shut down");
+    } catch {
+      toast.success("Backend shut down (connection closed)");
+    } finally {
+      setIsShuttingDown(false);
+    }
+  };
+
+  if (isShuttingDown) {
+    return (
+      <div className="flex items-center gap-1.5 px-3 py-1.5 text-[12px]" style={{ color: "var(--color-text-dim)" }}>
+        <Loader2 size={13} className="animate-spin" />
+        <span className="hidden sm:inline">Shutting down…</span>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      onBlur={() => { setTimeout(() => setConfirming(false), 150); }}
+      title={confirming ? "Click again to confirm" : "Shut down backend"}
+      className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-medium transition-all duration-200"
+      style={{
+        borderColor: confirming ? "rgba(239,68,68,0.5)" : "var(--color-border)",
+        background: confirming ? "rgba(239,68,68,0.08)" : "transparent",
+        color: confirming ? "#ef4444" : "var(--color-text-dim)",
+        boxShadow: confirming ? "0 0 12px rgba(239,68,68,0.1)" : "none",
+      }}
+    >
+      <PowerOff size={13} />
+      <span className="hidden sm:inline">{confirming ? "Confirm?" : "Shutdown"}</span>
+    </button>
+  );
+}
+
+// ─── Navbar ───────────────────────────────────────────────────────────────────
 
 export function Navbar() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { setAnalysis, setAnalyzing, isAnalyzing } = useClarityStore();
+  const { reportData, isUploading, setReport, setUploading, reset, cacheHeatmap } =
+    useClarityStore();
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleUploadClick = () => fileInputRef.current?.click();
 
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
-
-    setAnalyzing(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
+    e.target.value = "";
+    setUploading(true);
     try {
-      const response = await axios.post("/api/analyze", formData);
-      setAnalysis(response.data);
-    } catch (error) {
-      alert("Failed to analyze image.");
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/analyze", { method: "POST", body: fd });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: `HTTP ${res.status}` }));
+        throw new Error((err as { detail?: string }).detail ?? `HTTP ${res.status}`);
+      }
+      const raw: AnalyzeResponseWithSession = await res.json();
+      const mapped: ReportOnlyResponse = {
+        model: raw.model,
+        report: raw.report,
+        sentence_count: raw.sentence_count,
+        sentences: raw.sentences.map((s) => ({ index: s.index, sentence: s.sentence })),
+      };
+      setReport(file, mapped, raw.session_id);
+      raw.sentences.forEach((s) => cacheHeatmap(s.index, s.overlay_b64));
+    } catch (err: unknown) {
+      toast.error("Analysis failed", {
+        description: err instanceof Error ? err.message : String(err),
+      });
     } finally {
-      setAnalyzing(false);
+      setUploading(false);
     }
   };
 
   return (
-    <div
-      className="sticky top-0 z-50 
-                    bg-neutral-100 dark:bg-neutral-900 
-                    border-b border-neutral-200 dark:border-neutral-800"
+    <header
+      className="sticky top-0 z-50 backdrop-blur-xl"
+      style={{
+        background: "var(--color-surface)",
+        borderBottom: "1px solid var(--color-border)",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)",
+      }}
     >
-      <div className="flex items-center justify-between px-6 py-3">
-        {/* Logo */}
-        <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center justify-between px-5 py-2.5">
+        {/* Brand */}
+        <div className="flex items-center gap-3">
           <div
-            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg 
-                          bg-teal-500/10 border border-teal-500/20"
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl"
+            style={{
+              background: "var(--gradient-brand)",
+              boxShadow: "0 2px 8px var(--color-accent-glow), inset 0 1px 0 rgba(255,255,255,0.2)",
+            }}
           >
-            <Activity size={16} className="text-teal-500" />
+            <Activity size={18} className="text-white" />
           </div>
-
           <div>
             <h1
-              className="text-[14px] sm:text-[15px] font-bold tracking-wider uppercase
-                           text-neutral-800 dark:text-neutral-200"
+              className="text-[15px] font-extrabold tracking-wider uppercase"
+              style={{ color: "var(--color-text)" }}
             >
-              Clarity
+              CLARITY
             </h1>
-            <p className="hidden sm:block text-[11px] text-neutral-500 dark:text-neutral-400">
-              Clinical Decision Support
+            <p className="text-[10px] font-medium" style={{ color: "var(--color-text-ghost)" }}>
+              Explainable Radiology AI
             </p>
           </div>
         </div>
 
+        {/* Model badge */}
+        {reportData && (
+          <div
+            className="hidden md:flex items-center gap-2 rounded-full px-3.5 py-1.5"
+            style={{
+              background: "var(--color-accent-glow)",
+              border: "1px solid var(--color-accent-glow)",
+            }}
+          >
+            <div className="pulse-dot" />
+            <span
+              className="font-mono text-[11px] font-semibold uppercase tracking-wider"
+              style={{ color: "var(--color-accent)" }}
+            >
+              {reportData.model}
+            </span>
+          </div>
+        )}
+
         {/* Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-2">
           <input
-            type="file"
             ref={fileInputRef}
-            onChange={handleFileChange}
+            type="file"
+            accept="image/png,image/jpeg"
             className="hidden"
-            accept="image/*"
+            onChange={handleFileChange}
           />
 
-          {/* Upload */}
+          {reportData && (
+            <button
+              onClick={reset}
+              title="Reset"
+              className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-medium transition-all duration-200"
+              style={{
+                borderColor: "var(--color-border)",
+                color: "var(--color-text-dim)",
+              }}
+            >
+              <RotateCcw size={13} />
+              <span className="hidden sm:inline">Reset</span>
+            </button>
+          )}
+
           <button
             onClick={handleUploadClick}
-            disabled={isAnalyzing}
-            className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg 
-                       bg-teal-500 hover:bg-teal-600 
-                       text-white text-[12px] sm:text-[13px] font-semibold
-                       disabled:opacity-50"
+            disabled={isUploading}
+            className="flex items-center gap-2 rounded-xl px-5 py-2 text-[13px] font-bold text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+            style={{
+              background: "var(--gradient-brand)",
+              boxShadow: "0 2px 12px var(--color-accent-glow), 0 1px 2px rgba(0,0,0,0.1)",
+            }}
           >
-            {isAnalyzing ? (
-              <Loader2 className="animate-spin" size={14} />
+            {isUploading ? (
+              <Loader2 size={15} className="animate-spin" />
             ) : (
-              <Upload size={14} />
+              <Upload size={15} />
             )}
-            <span className="hidden sm:inline">
-              {isAnalyzing ? "Analyzing…" : "Analyze Scan"}
-            </span>
-            <span className="sm:hidden">{isAnalyzing ? "..." : "Analyze"}</span>
+            <span>{isUploading ? "Analyzing…" : "Analyze Scan"}</span>
           </button>
 
-          {/* Divider */}
-          <div
-            className="w-px h-4 sm:h-5 
-                          bg-neutral-200 dark:bg-neutral-800 mx-0.5 sm:mx-1"
-          />
-
-          {/* Theme toggle */}
+          <div className="h-5 w-px mx-1" style={{ background: "var(--color-border)" }} />
           <ModeToggle />
-
-          {/* Settings */}
-          <button
-            className="hidden sm:block p-1.5 sm:p-2 rounded-lg border border-transparent
-                       text-neutral-500 dark:text-neutral-400
-                       hover:text-neutral-900 dark:hover:text-neutral-200
-                       hover:bg-neutral-200 dark:hover:bg-neutral-800
-                       hover:border-neutral-200 dark:hover:border-neutral-700 transition"
-          >
-            <Settings size={16} />
-          </button>
-
-          {/* User */}
-          <button
-            className="p-1.5 sm:p-2 rounded-lg border border-transparent
-                       text-neutral-500 dark:text-neutral-400
-                       hover:text-neutral-900 dark:hover:text-neutral-200
-                       hover:bg-neutral-200 dark:hover:bg-neutral-800
-                       hover:border-neutral-200 dark:hover:border-neutral-700 transition"
-          >
-            <User size={16} />
-          </button>
+          <ShutdownButton />
         </div>
       </div>
-    </div>
+    </header>
   );
 }

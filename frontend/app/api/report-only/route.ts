@@ -1,21 +1,21 @@
 import { NextResponse } from "next/server";
 import { BACKEND_URL } from "@/lib/backend-url";
 
+/** Headers forwarded with every request to bypass ngrok's browser-warning interstitial. */
 const NGROK_PASSTHROUGH = { "ngrok-skip-browser-warning": "true" };
 
-/** Full /analyze endpoint — runs inference + all heatmaps at once (slow path). */
 export async function POST(request: Request) {
   const formData = await request.formData();
 
   let response: Response;
   try {
-    response = await fetch(`${BACKEND_URL}/analyze`, {
+    response = await fetch(`${BACKEND_URL}/report-only`, {
       method: "POST",
       headers: NGROK_PASSTHROUGH,
       body: formData,
     });
   } catch (err) {
-    console.error("[/api/analyze] Network error:", err);
+    console.error("[/api/report-only] Network error:", err);
     return NextResponse.json({ detail: "Backend unreachable" }, { status: 502 });
   }
 
