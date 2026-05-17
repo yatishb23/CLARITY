@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   Loader2,
   AlertCircle,
-  Sparkles,
   MousePointerClick,
   ArrowRight,
 } from "lucide-react";
@@ -72,41 +71,35 @@ function EmptyState() {
     <div className="flex h-full flex-col items-center justify-center gap-5 px-10 py-16 text-center">
       {/* Icon */}
       <div
-        className="relative flex h-20 w-20 items-center justify-center rounded-2xl"
+        className="flex h-16 w-16 items-center justify-center rounded-xl"
         style={{
-          background: "var(--color-accent-soft)",
-          border: "1px solid var(--color-accent-glow)",
+          background: "var(--color-surface-dim)",
+          border: "1px solid var(--color-border)",
         }}
       >
-        <FileText size={28} style={{ color: "var(--color-accent)", opacity: 0.5 }} />
-        <div
-          className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full"
-          style={{ background: "var(--gradient-brand)" }}
-        >
-          <Sparkles size={12} className="text-white" />
-        </div>
+        <FileText size={24} style={{ color: "var(--color-text-ghost)" }} />
       </div>
 
       {/* Copy */}
       <div>
-        <p className="text-[15px] font-bold" style={{ color: "var(--color-text)" }}>
+        <p className="text-[14px] font-semibold" style={{ color: "var(--color-text)" }}>
           No Report Generated
         </p>
-        <p className="mt-2 text-[13px] leading-relaxed" style={{ color: "var(--color-text-dim)" }}>
+        <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: "var(--color-text-dim)" }}>
           Upload a chest radiograph to generate<br />an AI-grounded radiology report.
         </p>
       </div>
 
       {/* Instruction */}
       <div
-        className="flex items-center gap-2.5 rounded-full px-5 py-2.5"
+        className="flex items-center gap-2 rounded-lg px-4 py-2"
         style={{
-          background: "var(--color-accent-soft)",
-          border: "1px solid var(--color-accent-glow)",
+          background: "var(--color-surface-dim)",
+          border: "1px solid var(--color-border)",
         }}
       >
-        <MousePointerClick size={14} style={{ color: "var(--color-accent)" }} />
-        <span className="text-[12px] font-medium" style={{ color: "var(--color-accent)" }}>
+        <MousePointerClick size={12} style={{ color: "var(--color-text-dim)" }} />
+        <span className="text-[11px]" style={{ color: "var(--color-text-dim)" }}>
           Click a sentence to reveal attention map
         </span>
       </div>
@@ -125,53 +118,54 @@ interface SentenceDetailProps {
 
 function SentenceDetail({ sentence, totalCount, hasHeatmap, isLoading }: SentenceDetailProps) {
   return (
-    <div className="mx-5 mb-5 animate-in fade-in slide-in-from-bottom-2 duration-200">
-      <div
-        className="glass-card rounded-xl p-5"
-        style={{ borderColor: "var(--color-accent-glow)" }}
-      >
+    <div className="mx-5 mb-5 animate-in fade-in slide-in-from-bottom-2 duration-150">
+      <div className="glass-card p-4">
         {/* Top row */}
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div
-              className="flex h-5 w-5 items-center justify-center rounded text-[10px] font-bold text-white"
-              style={{ background: "var(--gradient-brand)" }}
+            <span
+              className="flex h-5 w-5 items-center justify-center rounded text-[10px] font-bold"
+              style={{
+                background: "var(--color-surface-dim)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text-dim)",
+              }}
             >
               {sentence.index + 1}
-            </div>
-            <span className="text-label" style={{ color: "var(--color-text-dim)" }}>
+            </span>
+            <span className="text-label">
               Finding {sentence.index + 1} of {totalCount}
             </span>
           </div>
 
           {isLoading ? (
-            <span className="flex items-center gap-1.5 text-[11px] font-medium" style={{ color: "var(--color-accent)" }}>
+            <span className="flex items-center gap-1.5 text-[11px]" style={{ color: "var(--color-text-dim)" }}>
               <Loader2 size={11} className="animate-spin" />
               Fetching attention…
             </span>
           ) : hasHeatmap ? (
-            <span className="flex items-center gap-1.5 text-[11px] font-medium" style={{ color: "var(--color-ok)" }}>
+            <span className="flex items-center gap-1.5 text-[11px]" style={{ color: "var(--color-ok)" }}>
               <CheckCircle2 size={11} />
-              Attention map ready
+              Map ready
             </span>
           ) : null}
         </div>
 
         {/* Sentence text */}
-        <p className="text-[14px] leading-relaxed font-medium" style={{ color: "var(--color-text)" }}>
+        <p className="text-[13px] leading-relaxed" style={{ color: "var(--color-text)" }}>
           &ldquo;{sentence.sentence}&rdquo;
         </p>
 
         {/* Explanation */}
         {hasHeatmap && !isLoading && (
           <div
-            className="mt-4 flex items-start gap-2.5 rounded-lg p-3"
+            className="mt-3 flex items-start gap-2 rounded-md p-2.5"
             style={{
-              background: "var(--color-accent-soft)",
-              border: "1px solid var(--color-accent-glow)",
+              background: "var(--color-surface-dim)",
+              border: "1px solid var(--color-border)",
             }}
           >
-            <ArrowRight size={12} className="mt-0.5 shrink-0" style={{ color: "var(--color-accent)" }} />
+            <ArrowRight size={11} className="mt-0.5 shrink-0" style={{ color: "var(--color-text-ghost)" }} />
             <p className="text-[11px] leading-relaxed" style={{ color: "var(--color-text-dim)" }}>
               The heatmap highlights regions the model attended to when generating this
               finding. Correlate with clinical context before diagnostic decisions.
@@ -208,7 +202,7 @@ export function ReportView() {
     >
       {/* ── Header ──────────────────────────────────────────── */}
       <div
-        className="sticky top-0 z-10 px-6 py-4"
+        className="sticky top-0 z-10 px-5 py-3.5"
         style={{
           background: "var(--color-surface)",
           borderBottom: "1px solid var(--color-border)",
@@ -216,26 +210,24 @@ export function ReportView() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-label" style={{ color: "var(--color-text-ghost)" }}>AI-Generated</p>
-            <h2 className="mt-0.5 text-[16px] font-bold" style={{ color: "var(--color-text)" }}>
+            <p className="text-label">AI-Generated</p>
+            <h2 className="mt-0.5 text-[15px] font-semibold" style={{ color: "var(--color-text)" }}>
               Radiology Report
             </h2>
           </div>
 
           {reportData && (
-            <div className="flex items-center gap-4">
-              <div
-                className="flex items-center gap-2 rounded-full px-3 py-1.5"
-                style={{
-                  background: "var(--color-accent-soft)",
-                  border: "1px solid var(--color-accent-glow)",
-                }}
-              >
-                <div className="pulse-dot" style={{ width: 5, height: 5 }} />
-                <span className="text-[11px] font-semibold" style={{ color: "var(--color-accent)" }}>
-                  {reportData.sentence_count} finding{reportData.sentence_count !== 1 ? "s" : ""}
-                </span>
-              </div>
+            <div
+              className="flex items-center gap-2 rounded-md px-2.5 py-1"
+              style={{
+                background: "var(--color-surface-dim)",
+                border: "1px solid var(--color-border)",
+              }}
+            >
+              <div className="pulse-dot" style={{ width: 5, height: 5 }} />
+              <span className="text-[11px]" style={{ color: "var(--color-text-dim)" }}>
+                {reportData.sentence_count} finding{reportData.sentence_count !== 1 ? "s" : ""}
+              </span>
             </div>
           )}
         </div>
@@ -250,17 +242,14 @@ export function ReportView() {
         ) : (
           <>
             {/* Prose paragraph */}
-            <div className="px-6 pb-5 pt-7">
+            <div className="px-5 pb-5 pt-5">
               <div
-                className="glass-card rounded-xl p-6"
+                className="glass-card p-5"
                 style={{ background: "var(--color-card)" }}
               >
                 <p
-                  className="text-[15px] leading-[2.1] tracking-[0.005em]"
-                  style={{
-                    color: "var(--color-text-sub)",
-                    fontFamily: "'Instrument Serif', Georgia, serif",
-                  }}
+                  className="text-[14px] leading-[2.0] tracking-[0.003em]"
+                  style={{ color: "var(--color-text-sub)" }}
                 >
                   {reportData.sentences.map((s, i) => (
                     <Fragment key={s.index}>
@@ -278,10 +267,10 @@ export function ReportView() {
 
               {/* Hint */}
               {selectedSentenceIndex === null && loadingHeatmapIndex === null && (
-                <div className="mt-4 flex items-center gap-2" style={{ color: "var(--color-text-ghost)" }}>
-                  <MousePointerClick size={13} style={{ color: "var(--color-accent)" }} />
-                  <p className="text-[12px]">
-                    Click any sentence above to load its attention heatmap on the radiograph.
+                <div className="mt-3 flex items-center gap-1.5" style={{ color: "var(--color-text-ghost)" }}>
+                  <MousePointerClick size={12} />
+                  <p className="text-[11px]">
+                    Click any sentence to load its attention heatmap.
                   </p>
                 </div>
               )}
@@ -302,17 +291,16 @@ export function ReportView() {
 
       {/* ── Disclaimer ──────────────────────────────────────── */}
       <div
-        className="px-5 py-3"
+        className="px-5 py-2.5"
         style={{
           background: "var(--color-surface)",
           borderTop: "1px solid var(--color-border)",
         }}
       >
-        <div className="flex items-start gap-2">
-          <AlertCircle size={12} className="mt-0.5 shrink-0" style={{ color: "var(--color-text-ghost)", opacity: 0.6 }} />
+        <div className="flex items-start gap-1.5">
+          <AlertCircle size={11} className="mt-0.5 shrink-0" style={{ color: "var(--color-text-ghost)", opacity: 0.5 }} />
           <p className="text-[10px] leading-relaxed" style={{ color: "var(--color-text-ghost)" }}>
-            For research and decision support only. All findings must be verified
-            by a qualified radiologist prior to clinical use.
+            Research &amp; decision support only. Verify all findings with a qualified radiologist.
           </p>
         </div>
       </div>

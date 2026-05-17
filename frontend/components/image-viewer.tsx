@@ -10,22 +10,13 @@ export function ImageViewer() {
   const [showOverlay, setShowOverlay] = useState(true);
 
   const {
-    uploadedFile,
+    uploadedImageDataUrl,
     reportData,
     selectedSentenceIndex,
     loadingHeatmapIndex,
     heatmapCache,
     isUploading,
   } = useClarityStore();
-
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!uploadedFile) { setPreviewUrl(null); return; }
-    const url = URL.createObjectURL(uploadedFile);
-    setPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [uploadedFile]);
 
   const currentOverlay =
     selectedSentenceIndex !== null
@@ -133,7 +124,7 @@ export function ImageViewer() {
       {/* ── Viewport ──────────────────────────────────────── */}
       <div className="relative flex flex-1 items-center justify-center overflow-hidden p-8">
         {/* Ambient glow */}
-        {previewUrl && (
+        {uploadedImageDataUrl && (
           <div
             className="absolute inset-0 opacity-30"
             style={{ background: "var(--gradient-glow)" }}
@@ -176,7 +167,7 @@ export function ImageViewer() {
               </p>
             </div>
           </div>
-        ) : previewUrl ? (
+        ) : uploadedImageDataUrl ? (
           <div
             className="relative transition-transform duration-300 ease-out"
             style={{ height: "88%", aspectRatio: "1/1", transform: `scale(${scale})` }}
@@ -184,7 +175,7 @@ export function ImageViewer() {
             {/* Image with vignette */}
             <div className="relative h-full w-full rounded-lg overflow-hidden" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)" }}>
               <img
-                src={previewUrl}
+                src={uploadedImageDataUrl}
                 alt="Chest radiograph"
                 className="h-full w-full object-contain"
               />

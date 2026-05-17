@@ -36,16 +36,16 @@ MODEL_PKL     = _HERE / "saved_models" / "medgemma_model.pkl"
 PROCESSOR_PKL = _HERE / "saved_models" / "medgemma_processor.pkl"
 
 SYSTEM_PROMPT = (
-    "You are an expert radiologist. Analyze this chest X-ray and write a structured report. "
+    "You are an expert radiologist. Analyze this radiological scan and write a structured report. "
     "Describe each anatomical region in its own single, standalone sentence. "
     "Do NOT use bullet points, numbered lists, or bold text. "
     "If a region is normal, explicitly state it is normal. "
-    "Cover the lung fields, cardiac silhouette, mediastinum, costophrenic angles, and bones."
+    "Cover all relevant anatomical structures comprehensively."
 )
 
 CHAT_SYSTEM_PROMPT = (
     "You are CLARITY, an expert AI radiology assistant. "
-    "You have already analyzed a chest X-ray and generated a report. "
+    "You have already analyzed a radiological scan and generated a report. "
     "Answer the clinician's questions clearly, referencing the report and diagnostic data provided. "
     "When the clinician asks to SEE a heatmap or visualization for a specific pathology or region, "
     "respond ONLY with a JSON tool call like: "
@@ -97,7 +97,7 @@ class LLMService:
     ) -> tuple[str, str]:
         """Generate report. Returns (report_text, prompt_text)."""
         if self.mock_mode:
-            report_text = "This is a simulated medical layout. The lungs are clear. The heart is normal size."
+            report_text = "This is a simulated medical layout. No significant abnormalities are detected in this scan. The anatomical structures appear unremarkable."
             return report_text, "Prompt text here"
 
         prompt_text = self._build_prompt(image, SYSTEM_PROMPT)
@@ -339,6 +339,12 @@ class LLMService:
         history: list[dict],
         context: dict,
     ) -> dict:
+        if getattr(self, "mock_mode", False):
+            return {
+                "reply": "This is a simulated chat response. The real MedGemma model is not loaded, and no GEMINI_API_KEY was found in the environment.", 
+                "tool_call": None
+            }
+
         context_block = (
             f"[DIAGNOSTIC CONTEXT]\n"
             f"Top pathology: {context.get('top_pathology', 'Unknown')}\n"
@@ -409,7 +415,7 @@ class LLMService:
         # Panel 1: original
         ax = fig.add_subplot(rows, cols, 1)
         ax.imshow(image, cmap="gray")
-        ax.set_title("Original X-Ray", fontsize=10, fontweight="bold")
+        ax.set_title("Original Scan", fontsize=10, fontweight="bold")
         ax.axis("off")
 
         # Panel 2: Grad-CAM

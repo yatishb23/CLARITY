@@ -7,82 +7,82 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ================================================================
-   CLARITY — Premium Design Token System
+   CLARITY — Neutral Minimalist Design Token System
    ================================================================ */
 
 :root {
-  /* ── Core palette ─────────────────────────────────────── */
-  --color-bg:          #f0f2f7;
+  /* ── Core palette — warm neutral light ────────────────────── */
+  --color-bg:          #f5f5f4;
   --color-surface:     #ffffff;
-  --color-surface-dim: #f5f7fb;
+  --color-surface-dim: #f0efee;
   --color-surface-bright: #ffffff;
   --color-card:        #ffffff;
-  --color-card-hover:  #f8faff;
-  --color-border:      #e0e5ef;
-  --color-border-dim:  #eaeff6;
+  --color-card-hover:  #fafaf9;
+  --color-border:      #e5e5e4;
+  --color-border-dim:  #ededed;
 
   /* Text */
-  --color-text:        #111827;
-  --color-text-sub:    #374151;
-  --color-text-dim:    #6b7280;
-  --color-text-ghost:  #9ca3af;
+  --color-text:        #1a1a1a;
+  --color-text-sub:    #3d3d3d;
+  --color-text-dim:    #737373;
+  --color-text-ghost:  #a3a3a3;
 
-  /* Accent — teal */
-  --color-accent:      #0d9488;
-  --color-accent-dim:  #0f766e;
-  --color-accent-glow: rgba(13, 148, 136, 0.12);
-  --color-accent-soft: rgba(13, 148, 136, 0.06);
+  /* Accent — neutral slate */
+  --color-accent:      #404040;
+  --color-accent-dim:  #262626;
+  --color-accent-glow: rgba(64, 64, 64, 0.08);
+  --color-accent-soft: rgba(64, 64, 64, 0.05);
 
-  /* Accent 2 — indigo (secondary) */
-  --color-accent2:     #6366f1;
-  --color-accent2-glow: rgba(99, 102, 241, 0.10);
+  /* Accent 2 — mid gray */
+  --color-accent2:     #737373;
+  --color-accent2-glow: rgba(115, 115, 115, 0.08);
 
   /* Status */
-  --color-ok:      #16a34a;
-  --color-warn:    #d97706;
-  --color-danger:  #dc2626;
+  --color-ok:      #166534;
+  --color-warn:    #92400e;
+  --color-danger:  #991b1b;
 
   /* Viewer */
-  --color-viewer:  #080a10;
+  --color-viewer:  #0a0a0a;
 
-  /* Gradients */
-  --gradient-brand: linear-gradient(135deg, #0d9488 0%, #6366f1 100%);
-  --gradient-glow:  radial-gradient(ellipse at 30% 20%, rgba(13,148,136,0.08) 0%, transparent 60%);
-  --gradient-shine: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.06) 50%, transparent 70%);
+  /* Gradients — subtle, neutral */
+  --gradient-brand: linear-gradient(135deg, #404040 0%, #737373 100%);
+  --gradient-glow:  radial-gradient(ellipse at 30% 20%, rgba(0,0,0,0.03) 0%, transparent 60%);
+  --gradient-shine: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.04) 50%, transparent 70%);
 }
 
 .dark {
-  --color-bg:          #070a12;
-  --color-surface:     #0d1120;
-  --color-surface-dim: #0a0e1a;
-  --color-surface-bright: #141a2e;
-  --color-card:        #111828;
-  --color-card-hover:  #161e33;
-  --color-border:      #1e293b;
-  --color-border-dim:  #172033;
+  --color-bg:          #0a0a0a;
+  --color-surface:     #141414;
+  --color-surface-dim: #0f0f0f;
+  --color-surface-bright: #1a1a1a;
+  --color-card:        #1a1a1a;
+  --color-card-hover:  #1f1f1f;
+  --color-border:      #2a2a2a;
+  --color-border-dim:  #222222;
 
-  --color-text:        #f1f5f9;
-  --color-text-sub:    #94a3b8;
-  --color-text-dim:    #64748b;
-  --color-text-ghost:  #475569;
+  --color-text:        #f5f5f5;
+  --color-text-sub:    #d4d4d4;
+  --color-text-dim:    #737373;
+  --color-text-ghost:  #525252;
 
-  --color-accent:      #2dd4bf;
-  --color-accent-dim:  #14b8a6;
-  --color-accent-glow: rgba(45, 212, 191, 0.10);
-  --color-accent-soft: rgba(45, 212, 191, 0.04);
+  --color-accent:      #d4d4d4;
+  --color-accent-dim:  #a3a3a3;
+  --color-accent-glow: rgba(212, 212, 212, 0.06);
+  --color-accent-soft: rgba(212, 212, 212, 0.04);
 
-  --color-accent2:     #818cf8;
-  --color-accent2-glow: rgba(129, 140, 248, 0.08);
+  --color-accent2:     #a3a3a3;
+  --color-accent2-glow: rgba(163, 163, 163, 0.06);
 
   --color-ok:      #4ade80;
   --color-warn:    #fbbf24;
   --color-danger:  #f87171;
 
-  --color-viewer:  #030508;
+  --color-viewer:  #050505;
 
-  --gradient-brand: linear-gradient(135deg, #2dd4bf 0%, #818cf8 100%);
-  --gradient-glow:  radial-gradient(ellipse at 30% 20%, rgba(45,212,191,0.06) 0%, transparent 60%);
-  --gradient-shine: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.03) 50%, transparent 70%);
+  --gradient-brand: linear-gradient(135deg, #d4d4d4 0%, #737373 100%);
+  --gradient-glow:  radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.02) 0%, transparent 60%);
+  --gradient-shine: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.02) 50%, transparent 70%);
 }
 
 /* ── Base ────────────────────────────────────────────────── */
@@ -99,8 +99,8 @@
   }
 
   ::selection {
-    background: var(--color-accent-glow);
-    color: var(--color-accent);
+    background: rgba(0,0,0,0.08);
+    color: var(--color-text);
   }
 
   /* Thin scrollbar */
@@ -108,7 +108,7 @@
     scrollbar-width: thin;
     scrollbar-color: var(--color-border) transparent;
   }
-  .scrollbar-thin::-webkit-scrollbar { width: 5px; }
+  .scrollbar-thin::-webkit-scrollbar { width: 4px; }
   .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background: var(--color-border);
@@ -124,9 +124,9 @@
   .text-label {
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-text-dim);
+    color: var(--color-text-ghost);
   }
 
   /* Viewer badge */
@@ -134,93 +134,102 @@
     display: inline-flex;
     align-items: center;
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: 3px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 9px;
     font-weight: 500;
     letter-spacing: 0.06em;
-    color: rgba(255, 255, 255, 0.35);
-    background: rgba(0, 0, 0, 0.55);
+    color: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(8px);
   }
 
-  /* Gradient text */
+  /* Neutral text (no gradient fill) */
   .text-gradient {
-    background: var(--gradient-brand);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-text);
   }
 
-  /* Glass card */
+  /* Clean card */
   .glass-card {
     background: var(--color-card);
     border: 1px solid var(--color-border);
-    border-radius: 16px;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.03);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
   }
 
   .dark .glass-card {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.15),
-                inset 0 1px 0 rgba(255,255,255,0.03);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
 
-  /* Glow ring for accent elements */
+  /* Subtle ring */
   .glow-ring {
-    box-shadow: 0 0 0 1px var(--color-accent-glow),
-                0 0 20px var(--color-accent-glow);
+    box-shadow: 0 0 0 1px var(--color-border);
   }
 
-  /* Pulse dot */
+  /* Pulse dot — neutral */
   .pulse-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--color-accent);
-    box-shadow: 0 0 8px var(--color-accent-glow);
-    animation: pulse-glow 2s ease-in-out infinite;
+    background: var(--color-text-dim);
+    animation: pulse-neutral 2s ease-in-out infinite;
   }
 
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 4px var(--color-accent-glow); opacity: 1; }
-    50%      { box-shadow: 0 0 16px var(--color-accent-glow); opacity: 0.7; }
+  @keyframes pulse-neutral {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
   }
 
   /* Sentence interaction styles */
   .sentence-span {
     cursor: pointer;
-    border-radius: 3px;
-    padding: 1px 3px;
-    transition: all 0.2s ease;
+    border-radius: 2px;
+    padding: 1px 2px;
+    transition: all 0.15s ease;
     text-decoration-color: transparent;
     text-underline-offset: 3px;
-    text-decoration-thickness: 2px;
+    text-decoration-thickness: 1px;
   }
 
   .sentence-span:hover {
-    background: var(--color-accent-soft);
+    background: rgba(0,0,0,0.06);
     color: var(--color-text);
     text-decoration: underline;
-    text-decoration-color: var(--color-accent);
+    text-decoration-color: var(--color-text-dim);
+  }
+
+  .dark .sentence-span:hover {
+    background: rgba(255,255,255,0.06);
   }
 
   .sentence-span.active {
-    background: var(--color-accent-glow);
-    color: var(--color-accent);
+    background: rgba(0,0,0,0.08);
+    color: var(--color-text);
     text-decoration: underline;
-    text-decoration-color: var(--color-accent);
+    text-decoration-color: var(--color-text-sub);
     font-weight: 500;
   }
 
-  .sentence-span.loading {
-    animation: sentence-pulse 1.5s ease-in-out infinite;
+  .dark .sentence-span.active {
+    background: rgba(255,255,255,0.08);
   }
 
-  @keyframes sentence-pulse {
-    0%, 100% { background: var(--color-accent-soft); }
-    50%      { background: var(--color-accent-glow); }
+  .sentence-span.loading {
+    animation: sentence-pulse-neutral 1.5s ease-in-out infinite;
+  }
+
+  @keyframes sentence-pulse-neutral {
+    0%, 100% { background: rgba(0,0,0,0.04); }
+    50%      { background: rgba(0,0,0,0.08); }
+  }
+
+  .dark .sentence-span.loading {
+    animation: sentence-pulse-neutral-dark 1.5s ease-in-out infinite;
+  }
+
+  @keyframes sentence-pulse-neutral-dark {
+    0%, 100% { background: rgba(255,255,255,0.04); }
+    50%      { background: rgba(255,255,255,0.08); }
   }
 
   /* Shimmer */
@@ -233,10 +242,27 @@
     position: absolute;
     inset: 0;
     background: var(--gradient-shine);
-    animation: shimmer-move 2s ease-in-out infinite;
+    animation: shimmer-move 1.8s ease-in-out infinite;
   }
   @keyframes shimmer-move {
     0%   { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
   }
+
+  /* Markdown rendering in chat */
+  .prose-chat p { margin-bottom: 0.5em; }
+  .prose-chat p:last-child { margin-bottom: 0; }
+  .prose-chat strong { font-weight: 600; color: var(--color-text); }
+  .prose-chat em { font-style: italic; }
+  .prose-chat ul { list-style: disc; padding-left: 1.2em; margin: 0.4em 0; }
+  .prose-chat ol { list-style: decimal; padding-left: 1.2em; margin: 0.4em 0; }
+  .prose-chat li { margin: 0.15em 0; }
+  .prose-chat code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    background: rgba(0,0,0,0.06);
+    border-radius: 3px;
+    padding: 1px 4px;
+  }
+  .dark .prose-chat code { background: rgba(255,255,255,0.08); }
 }

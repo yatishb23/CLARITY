@@ -6,12 +6,6 @@ import { ChatBox } from "@/components/chat-box";
 export default function Home() {
   return (
     <main className="relative flex h-screen flex-col overflow-hidden" style={{ background: "var(--color-bg)" }}>
-      {/* Ambient background glow */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "var(--gradient-glow)" }}
-      />
-
       <Navbar />
 
       {/* Two-panel workspace */}

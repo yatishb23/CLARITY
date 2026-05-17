@@ -1,12 +1,62 @@
-// ─── Spec-aligned types for the CXR Attention Rollout API ───────────────────
+// ─── Spec-aligned types for the CLARITY API ──────────────────────────────────
 
-/** A single sentence entry returned by /report-only */
+// ── /analyze ──────────────────────────────────────────────────────────────────
+
+export interface Pathology {
+  name: string;
+  probability: number;
+  auc?: number;
+}
+
+export interface GradCAMResult {
+  pathology: string;
+  heatmap_b64: string;
+  overlay_b64: string;
+}
+
+/** Per-sentence attention heatmap from /analyze */
+export interface SentenceAttention {
+  index: number;
+  sentence: string;
+  overlay_b64: string;
+  attention_map_b64: string;
+}
+
+/** Full response from POST /analyze */
+export interface AnalyzeResponse {
+  model: string;
+  // DenseNet
+  top_pathology: string;
+  all_pathologies: Pathology[];
+
+  // Grad-CAM
+  gradcam_results: GradCAMResult[];
+
+  // LLM report
+  report: string;
+  sentences: string[];           // plain sentence strings
+
+  // Per-sentence attention
+  sentence_results: SentenceAttention[];
+
+  // Summary grid
+  grid_image_b64: string;
+
+  // Session for chat
+  session_id: string;
+
+  manifest: Record<string, unknown>;
+}
+
+// ── Frontend-only view models ─────────────────────────────────────────────────
+
+/** A single sentence as used in the UI (index + text) */
 export interface ReportSentence {
   index: number;
   sentence: string;
 }
 
-/** Response from POST /report-only */
+/** Subset of AnalyzeResponse used by the report panel */
 export interface ReportOnlyResponse {
   model: string;
   report: string;
@@ -14,45 +64,8 @@ export interface ReportOnlyResponse {
   sentences: ReportSentence[];
 }
 
-/** A sentence with embedded heatmap data from /analyze */
-export interface SentenceWithOverlay extends ReportSentence {
-  heatmap: number[][];
-  overlay_b64: string;
-  attention_map_b64?: string;
-}
+// ── /chat ─────────────────────────────────────────────────────────────────────
 
-/** Actual response from POST /analyze — like ReportOnlyResponse but each sentence carries heatmap data */
-export interface AnalyzeResponse {
-  model: string;
-  report: string;
-  sentence_count: number;
-  sentences: SentenceWithOverlay[];
-}
-
-/** Response from POST /heatmap/{sentence_index} */
-export interface HeatmapResponse {
-  index: number;
-  sentence: string;
-  /** 2-D float array (values 0.0–1.0), model vision-patch grid resolution */
-  heatmap: number[][];
-  /** Ready-to-render: use as `data:image/png;base64,{overlay_b64}` */
-  overlay_b64: string;
-}
-
-/** Response from GET /health */
-export interface HealthResponse {
-  status: "ok";
-  model: string;
-}
-
-/** Standard backend error shape */
-export interface APIError {
-  detail: string;
-}
-
-// ─── Chat types (mirrors backend schemas) ─────────────────────────────
-
-/** A chat message as stored in the backend history */
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
@@ -64,14 +77,12 @@ export interface ChatMessageDisplay extends ChatMessage {
   image_label?: string;
 }
 
-/** Request body for POST /chat */
 export interface ChatRequest {
   session_id: string;
   message: string;
   history: ChatMessage[];
 }
 
-/** Response from POST /chat */
 export interface ChatResponse {
   reply: string;
   tool_calls: Array<{ tool_name: string; arguments: Record<string, unknown> }>;
@@ -79,7 +90,13 @@ export interface ChatResponse {
   image_label?: string;
 }
 
-/** Parsed /analyze response includes session_id for follow-up chat */
-export interface AnalyzeResponseWithSession extends AnalyzeResponse {
-  session_id: string;
+// ── /health ───────────────────────────────────────────────────────────────────
+
+export interface HealthResponse {
+  status: "ok";
+  model: string;
+}
+
+export interface APIError {
+  detail: string;
 }
