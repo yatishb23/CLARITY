@@ -18,12 +18,18 @@ export function ImageViewer() {
     selectedSentenceIndex,
     loadingHeatmapIndex,
     heatmapCache,
+    attentionMapCache,
     isUploading,
   } = useClarityStore();
 
   const currentOverlay =
     selectedSentenceIndex !== null
       ? heatmapCache[selectedSentenceIndex] ?? null
+      : null;
+
+  const currentAttentionMap =
+    selectedSentenceIndex !== null
+      ? attentionMapCache[selectedSentenceIndex] ?? null
       : null;
 
   const isHeatmapLoading = loadingHeatmapIndex !== null;
@@ -53,7 +59,7 @@ export function ImageViewer() {
             Imaging Modality
           </p>
           <h3 className="text-[13px] font-semibold" style={{ color: "rgba(255,255,255,0.65)" }}>
-            Chest Radiograph · AP View
+            Radiograph · AP View
           </h3>
         </div>
 
@@ -128,7 +134,7 @@ export function ImageViewer() {
               />
             </div>
             {(brightness !== 100 || contrast !== 100 || invert) && (
-              <button 
+              <button
                 onClick={() => { setBrightness(100); setContrast(100); setInvert(false); }}
                 className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded opacity-50 hover:opacity-100 transition-opacity"
                 style={{ background: "rgba(255,255,255,0.1)", color: "white" }}
@@ -167,7 +173,7 @@ export function ImageViewer() {
       </div>
 
       {/* ── Viewport ──────────────────────────────────────── */}
-      <div className="relative flex flex-1 items-center justify-center overflow-hidden p-8">
+      <div className="relative flex flex-col flex-1 items-center overflow-hidden p-6 pb-4">
         {/* Ambient glow */}
         {uploadedImageDataUrl && (
           <div
@@ -213,10 +219,12 @@ export function ImageViewer() {
             </div>
           </div>
         ) : uploadedImageDataUrl ? (
-          <div
-            className="relative transition-transform duration-300 ease-out"
-            style={{ height: "88%", aspectRatio: "1/1", transform: `scale(${scale})` }}
-          >
+          <>
+            <div className="relative flex-1 flex items-center justify-center w-full min-h-0">
+              <div
+                className="relative h-full transition-transform duration-300 ease-out"
+                style={{ aspectRatio: "1/1", transform: `scale(${scale})` }}
+              >
             {/* Image with vignette */}
             <div className="relative h-full w-full rounded-lg overflow-hidden" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)" }}>
               <img
@@ -282,7 +290,63 @@ export function ImageViewer() {
               <span className="viewer-badge">PNG</span>
               <span className="viewer-badge">CXR</span>
             </div>
-          </div>
+
+            </div>
+            </div>
+
+            {/* 3-Panel Detail View */}
+            {currentOverlay && (
+              <div
+                className="shrink-0 mt-4 flex items-center gap-4 p-3 rounded-xl"
+                style={{
+                  background: "rgba(0,0,0,0.65)",
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(255,255,255,0.1)"
+                }}
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-24 h-24 rounded border border-[rgba(255,255,255,0.1)] overflow-hidden bg-black/50">
+                    <img
+                      src={uploadedImageDataUrl}
+                      alt="Original"
+                      className="w-full h-full object-cover"
+                      style={{ filter: `brightness(${brightness}%) contrast(${contrast}%) ${invert ? 'invert(100%)' : ''}` }}
+                    />
+                  </div>
+                  <span className="text-[9px] uppercase tracking-wider font-semibold text-[rgba(255,255,255,0.6)]">Original</span>
+                </div>
+
+                {currentAttentionMap && (
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-24 h-24 rounded border border-[rgba(255,255,255,0.1)] overflow-hidden bg-black/50">
+                      <img
+                        src={`data:image/png;base64,${currentAttentionMap}`}
+                        alt="Attention Map"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="text-[9px] uppercase tracking-wider font-semibold text-[rgba(255,255,255,0.6)]">Attention Map</span>
+                  </div>
+                )}
+
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-24 h-24 rounded border border-[rgba(255,255,255,0.1)] overflow-hidden bg-black/50 relative">
+                    <img
+                      src={uploadedImageDataUrl}
+                      alt="Overlay Base"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <img
+                      src={`data:image/png;base64,${currentOverlay}`}
+                      alt="Overlay Heatmap"
+                      className="absolute inset-0 w-full h-full object-cover opacity-70"
+                    />
+                  </div>
+                  <span className="text-[9px] uppercase tracking-wider font-semibold text-[rgba(255,255,255,0.6)]">Overlay</span>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="flex flex-col items-center gap-4 text-center">
             <div

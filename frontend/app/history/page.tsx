@@ -7,55 +7,18 @@ import { Clock, ChevronRight, FileX } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function HistoryPage() {
-  const { scanCache, restoreFromScanCache } = useClarityStore();
+  const { scanCache, restoreFromScanCache, _hasHydrated } = useClarityStore();
   const router = useRouter();
-  
-  // Need to handle hydration mismatch by only rendering after mount
-  const [mounted, setMounted] = useState(false);
-  const [localScans, setLocalScans] = useState<Record<string, any>>({});
 
-  useEffect(() => {
-    setMounted(true);
-    // Also read from standard localStorage to show older scans before IndexedDB switch
-    try {
-      const lsData = window.localStorage.getItem("clarity-storage");
-      if (lsData) {
-        const parsed = JSON.parse(lsData);
-        if (parsed?.state?.scanCache) {
-          setLocalScans(parsed.state.scanCache);
-        }
-      }
-    } catch (e) {
-      console.error("Failed to parse localStorage clarity-storage", e);
-    }
-  }, []);
+
 
   const handleRestore = (fileName: string) => {
-    // If it's in localScans but not in the IDB scanCache, we could manually restore it,
-    // but the store's restore function might only look at its own scanCache.
-    // However, if we just push to home, the store needs to know about it.
-    // For now, let's try the store's restore, and if it fails, we manually set it.
     if (restoreFromScanCache(fileName)) {
-      router.push("/");
-    } else if (localScans[fileName]) {
-      const scan = localScans[fileName];
-      useClarityStore.setState({
-        reportData: scan.reportData,
-        uploadedImageDataUrl: scan.uploadedImageDataUrl,
-        sessionId: scan.sessionId,
-        heatmapCache: scan.heatmapCache,
-        chatMessages: scan.chatMessages,
-        chatHistory: scan.chatHistory,
-        selectedSentenceIndex: null,
-        loadingHeatmapIndex: null,
-      });
       router.push("/");
     }
   };
 
-  // Merge the caches, preferring the store's cache
-  const mergedCache = { ...localScans, ...scanCache };
-  const cachedScans = Object.entries(mergedCache || {});
+  const cachedScans = Object.entries(scanCache || {});
 
   return (
     <main className="relative flex h-screen flex-col overflow-hidden" style={{ background: "var(--color-bg)" }}>
@@ -70,7 +33,7 @@ export default function HistoryPage() {
             </p>
           </header>
 
-          {!mounted ? (
+          {!_hasHydrated ? (
             <div className="flex h-40 items-center justify-center opacity-50">Loading history...</div>
           ) : cachedScans.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 opacity-50 border border-dashed rounded-lg" style={{ borderColor: "var(--color-border)" }}>

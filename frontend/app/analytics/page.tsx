@@ -22,27 +22,8 @@ const baseVolumeData = [
 ];
 
 export default function AnalyticsPage() {
-  const { scanCache } = useClarityStore();
-  const [localScans, setLocalScans] = useState<Record<string, any>>({});
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    try {
-      const lsData = window.localStorage.getItem("clarity-storage");
-      if (lsData) {
-        const parsed = JSON.parse(lsData);
-        if (parsed?.state?.scanCache) {
-          setLocalScans(parsed.state.scanCache);
-        }
-      }
-    } catch (e) {
-      console.error("Failed to parse localStorage", e);
-    }
-  }, []);
-
-  const mergedCache = { ...localScans, ...scanCache };
-  const allScans = Object.values(mergedCache || {});
+  const { scanCache, _hasHydrated } = useClarityStore();
+  const allScans = Object.values(scanCache || {});
 
   // Aggregate Pathologies
   const pathologyCounts: Record<string, number> = {};
@@ -90,7 +71,11 @@ export default function AnalyticsPage() {
             </div>
           </header>
 
-          {/* Top KPIs */}
+          {!_hasHydrated ? (
+            <div className="flex h-40 items-center justify-center opacity-50">Loading analytics...</div>
+          ) : (
+            <>
+              {/* Top KPIs */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="glass-card p-5">
               <div className="flex items-start justify-between">
@@ -184,7 +169,8 @@ export default function AnalyticsPage() {
               </div>
             </div>
           </div>
-          
+            </>
+          )}
         </div>
       </div>
     </main>

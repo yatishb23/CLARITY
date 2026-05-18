@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage, StateStorage } from "zustand/middleware";
 import { get, set as idbSet, del } from "idb-keyval";
-import type { ReportOnlyResponse, ChatMessageDisplay } from "./api-types";
+import type { ReportOnlyResponse, ChatMessageDisplay, AnalyzeResponse } from "./api-types";
 
 // ─── Custom IndexedDB Storage Adapter for Zustand ─────────────────────────────
 const idbStorage: StateStorage = {
@@ -23,11 +23,19 @@ interface CachedScan {
   uploadedImageDataUrl: string;
   sessionId: string;
   heatmapCache: Record<number, string>;
+  attentionMapCache: Record<number, string>;
   chatMessages: ChatMessageDisplay[];
   chatHistory: ChatMessageDisplay[][];
 }
 
+interface ParallelCachedScan {
+  manualOriginalImage: string;
+  manualLeftScan: AnalyzeResponse;
+  manualRightScan: AnalyzeResponse;
+}
+
 interface ClarityState {
+  _hasHydrated: boolean;
   // Data
   reportData: ReportOnlyResponse | null;
   uploadedImageDataUrl: string | null;
@@ -40,6 +48,8 @@ interface ClarityState {
 
   /** index → overlay_b64; avoids redundant network calls */
   heatmapCache: Record<number, string>;
+  /** index → attention_map_b64 */
+  attentionMapCache: Record<number, string>;
 
   // Chat
   chatMessages: ChatMessageDisplay[];
@@ -48,8 +58,11 @@ interface ClarityState {
 
   // Global Scan Cache
   scanCache: Record<string, CachedScan>;
+  parallelCache: Record<string, ParallelCachedScan>;
 
   // Actions
+  setHasHydrated: (state: boolean) => void;
+  cacheParallelAnalysis: (fileName: string, data: ParallelCachedScan) => void;
   setReport: (dataUrl: string, data: ReportOnlyResponse, sessionId?: string) => void;
   setUploading: (uploading: boolean) => void;
   selectSentence: (index: number | null) => void;
@@ -76,10 +89,12 @@ const INITIAL: Pick<
   | "selectedSentenceIndex"
   | "loadingHeatmapIndex"
   | "heatmapCache"
+  | "attentionMapCache"
   | "chatMessages"
   | "chatHistory"
   | "isChatLoading"
   | "scanCache"
+  | "parallelCache"
 > = {
   reportData: null,
   uploadedImageDataUrl: null,
@@ -88,10 +103,12 @@ const INITIAL: Pick<
   selectedSentenceIndex: null,
   loadingHeatmapIndex: null,
   heatmapCache: {},
+  attentionMapCache: {},
   chatMessages: [],
   chatHistory: [],
   isChatLoading: false,
   scanCache: {},
+  parallelCache: {},
 };
 
 // ─── Store ────────────────────────────────────────────────────────────────────
@@ -102,6 +119,11 @@ export const useClarityStore = create<ClarityState>()(
   persist(
     (set) => ({
       ...INITIAL,
+      _hasHydrated: false,
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
+      
+      cacheParallelAnalysis: (fileName, data) => 
+        set((state) => ({ parallelCache: { ...state.parallelCache, [fileName]: data } })),
 
       setReport: (dataUrl, data, sessionId) =>
         set({
@@ -111,6 +133,7 @@ export const useClarityStore = create<ClarityState>()(
           selectedSentenceIndex: null,
           loadingHeatmapIndex: null,
           heatmapCache: {},
+          attentionMapCache: {},
           chatMessages: [],
           chatHistory: [],
         }),
@@ -121,10 +144,14 @@ export const useClarityStore = create<ClarityState>()(
 
       setLoadingHeatmap: (index) => set({ loadingHeatmapIndex: index }),
 
-      cacheHeatmap: (index, overlay_b64) =>
+      cacheHeatmap: (index: number, overlay_b64: string, attention_map_b64?: string) => {
         set((state) => ({
           heatmapCache: { ...state.heatmapCache, [index]: overlay_b64 },
-        })),
+          attentionMapCache: attention_map_b64 
+            ? { ...state.attentionMapCache, [index]: attention_map_b64 } 
+            : state.attentionMapCache,
+        }));
+      },
 
       setSessionId: (id) => set({ sessionId: id }),
 
@@ -166,6 +193,7 @@ export const useClarityStore = create<ClarityState>()(
             uploadedImageDataUrl: state.uploadedImageDataUrl,
             sessionId: state.sessionId || "",
             heatmapCache: state.heatmapCache,
+            attentionMapCache: state.attentionMapCache,
             chatMessages: state.chatMessages,
             chatHistory: state.chatHistory,
           };
@@ -185,6 +213,7 @@ export const useClarityStore = create<ClarityState>()(
               uploadedImageDataUrl: cached.uploadedImageDataUrl,
               sessionId: cached.sessionId,
               heatmapCache: cached.heatmapCache,
+              attentionMapCache: cached.attentionMapCache || {},
               chatMessages: cached.chatMessages,
               chatHistory: cached.chatHistory,
               selectedSentenceIndex: null,
@@ -206,10 +235,15 @@ export const useClarityStore = create<ClarityState>()(
         uploadedImageDataUrl: state.uploadedImageDataUrl,
         sessionId: state.sessionId,
         heatmapCache: state.heatmapCache,
+        attentionMapCache: state.attentionMapCache,
         chatMessages: state.chatMessages,
         chatHistory: state.chatHistory,
         scanCache: state.scanCache,
+        parallelCache: state.parallelCache,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );
