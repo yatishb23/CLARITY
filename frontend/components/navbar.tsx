@@ -78,7 +78,7 @@ export function Navbar() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     // Attempt to restore from cache before hitting the backend
     if (restoreFromScanCache(file.name)) {
       toast.success(`Restored cached analysis for ${file.name}`);
@@ -129,7 +129,7 @@ export function Navbar() {
           });
         }
         setUploading(false);
-        
+
         // Save this entire session state under the filename
         saveToScanCache(file.name);
       };
@@ -178,35 +178,35 @@ export function Navbar() {
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-6 ml-8">
-          <Link 
+          <Link
             href="/"
             className="text-[12px] font-medium transition-colors hover:opacity-80"
             style={{ color: "var(--color-text)" }}
           >
             Dashboard
           </Link>
-          <Link 
+          <Link
             href="/history"
             className="text-[12px] font-medium transition-colors hover:opacity-80"
             style={{ color: "var(--color-text-dim)" }}
           >
             Scan History
           </Link>
-          <Link 
+          <Link
             href="/compare"
             className="text-[12px] font-medium transition-colors hover:opacity-80"
             style={{ color: "var(--color-text-dim)" }}
           >
             Compare
           </Link>
-          <Link 
+          <Link
             href="/analytics"
             className="text-[12px] font-medium transition-colors hover:opacity-80"
             style={{ color: "var(--color-text-dim)" }}
           >
             Analytics
           </Link>
-          <Link 
+          <Link
             href="/guidelines"
             className="text-[12px] font-medium transition-colors hover:opacity-80"
             style={{ color: "var(--color-text-dim)" }}

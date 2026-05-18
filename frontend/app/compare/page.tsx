@@ -3,7 +3,7 @@
 import { useClarityStore } from "@/lib/store";
 import { Navbar } from "@/components/navbar";
 import { useState, useEffect, useRef } from "react";
-import { SplitSquareHorizontal, Image as ImageIcon, UploadCloud, Loader2, GitCompare } from "lucide-react";
+import { SplitSquareHorizontal, Image as ImageIcon, UploadCloud, Loader2, GitCompare, MousePointerClick } from "lucide-react";
 import type { AnalyzeResponse } from "@/lib/api-types";
 
 export default function ComparePage() {
@@ -21,6 +21,8 @@ export default function ComparePage() {
   const [manualOriginalImage, setManualOriginalImage] = useState<string | null>(null);
   const [manualLeftScan, setManualLeftScan] = useState<AnalyzeResponse | null>(null);
   const [manualRightScan, setManualRightScan] = useState<AnalyzeResponse | null>(null);
+  const [leftSentenceIdx, setLeftSentenceIdx] = useState<number | null>(null);
+  const [rightSentenceIdx, setRightSentenceIdx] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -32,6 +34,8 @@ export default function ComparePage() {
         setManualOriginalImage(latest.manualOriginalImage);
         setManualLeftScan(latest.manualLeftScan);
         setManualRightScan(latest.manualRightScan);
+        setLeftSentenceIdx(null);
+        setRightSentenceIdx(null);
       }
     }
   }, [_hasHydrated]);
@@ -51,12 +55,16 @@ export default function ComparePage() {
       setManualOriginalImage(cached.manualOriginalImage);
       setManualLeftScan(cached.manualLeftScan);
       setManualRightScan(cached.manualRightScan);
+      setLeftSentenceIdx(null);
+      setRightSentenceIdx(null);
       return; // Instantly load without hitting the API
     }
 
     setIsAnalyzing(true);
     setManualLeftScan(null);
     setManualRightScan(null);
+    setLeftSentenceIdx(null);
+    setRightSentenceIdx(null);
 
     // Show the base image immediately and await it for the cache
     const base64Image = await new Promise<string>((resolve) => {
@@ -260,50 +268,71 @@ export default function ComparePage() {
                     <span className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-sub)]">Baseline Processing</span>
                     <span className="text-[10px] font-mono text-[var(--color-text-ghost)]">sigma=1.5 | layers=6</span>
                   </div>
-                  <div className="flex-1 relative bg-black/5 p-4 flex flex-col items-center justify-center">
+                  <div className="flex-1 relative bg-black/5 p-4 flex flex-col min-h-0">
                     {isAnalyzing ? (
-                      <div className="flex flex-col items-center gap-3">
+                      <div className="flex flex-col items-center justify-center h-full gap-3">
                         <Loader2 size={24} className="animate-spin text-[var(--color-accent)]" />
                         <span className="text-xs text-[var(--color-text-sub)]">Pipeline A running...</span>
                       </div>
                     ) : manualLeftScan && manualOriginalImage ? (
                       <>
-                        <div className="flex-1 min-h-0 w-full flex flex-col gap-2">
-                          <div className="flex-1 flex flex-col items-center justify-center min-h-0 bg-black/20 rounded-md p-1 border border-white/5">
-                            <span className="text-[9px] uppercase tracking-widest text-[var(--color-text-ghost)] mb-1">Original Image</span>
+                        <div className="flex-1 min-h-0 w-full flex items-center justify-center p-2 relative">
+                          <div className="relative h-full w-full rounded-lg overflow-hidden border border-[rgba(255,255,255,0.05)] bg-black/20 flex items-center justify-center">
                             <img 
                               src={manualOriginalImage} 
                               alt="Original" 
-                              className="max-h-full max-w-full object-contain rounded"
+                              className="absolute inset-0 h-full w-full object-contain"
                             />
-                          </div>
-                          {manualLeftScan.gradcam_results?.[0]?.overlay_b64 && (
-                            <div className="flex-1 flex flex-col items-center justify-center min-h-0 bg-black/20 rounded-md p-1 border border-white/5">
-                              <span className="text-[9px] uppercase tracking-widest text-[var(--color-text-ghost)] mb-1">Attention Map</span>
+                            {(leftSentenceIdx !== null && manualLeftScan.sentence_results?.[leftSentenceIdx]?.overlay_b64) ? (
+                              <img 
+                                src={`data:image/png;base64,${manualLeftScan.sentence_results[leftSentenceIdx].overlay_b64}`} 
+                                alt="Overlay Heatmap" 
+                                className="absolute inset-0 h-full w-full object-contain opacity-70 mix-blend-screen transition-all"
+                              />
+                            ) : manualLeftScan.gradcam_results?.[0]?.overlay_b64 ? (
                               <img 
                                 src={`data:image/png;base64,${manualLeftScan.gradcam_results[0].overlay_b64}`} 
-                                alt="Heatmap" 
-                                className="max-h-full max-w-full object-contain rounded"
+                                alt="Overlay Heatmap" 
+                                className="absolute inset-0 h-full w-full object-contain opacity-70 mix-blend-screen transition-all"
                               />
-                            </div>
-                          )}
+                            ) : null}
+                          </div>
                         </div>
-                        <div className="mt-4 p-3 rounded-lg bg-[var(--color-surface-dim)] border border-[var(--color-border)] w-full overflow-y-auto h-[45%] shrink-0 scrollbar-thin flex flex-col gap-2">
+                        <div className="mt-4 p-3 rounded-lg bg-[var(--color-surface-dim)] border border-[var(--color-border)] w-full overflow-y-auto h-[40%] shrink-0 scrollbar-thin flex flex-col gap-2">
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-bold uppercase text-[var(--color-text-ghost)]">Top Finding:</span>
                             <span className="text-sm font-semibold text-[var(--color-accent)]">{manualLeftScan.top_pathology}</span>
                           </div>
-                          <div className="text-[10px] font-bold uppercase text-[var(--color-text-ghost)] mt-1">Generated Sentences</div>
-                          <div className="flex flex-col gap-1.5">
+                          <div className="text-[10px] font-bold uppercase text-[var(--color-text-ghost)] mt-1 mb-1">Generated Sentences</div>
+                          <p className="text-[13px] leading-relaxed text-[var(--color-text-sub)]">
                             {manualLeftScan.sentences.map((s, idx) => {
                               const text = typeof s === "string" ? s : (s as any).sentence;
+                              const isSelected = leftSentenceIdx === idx;
                               return (
-                                <div key={idx} className="p-2 rounded bg-black/20 border border-[rgba(255,255,255,0.05)] text-xs text-[var(--color-text-sub)] leading-relaxed">
-                                  {text}
-                                </div>
+                                <span key={idx}>
+                                  <span
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-pressed={isSelected}
+                                    onClick={() => setLeftSentenceIdx(isSelected ? null : idx)}
+                                    className={`cursor-pointer transition-colors px-1 py-0.5 rounded ${
+                                      isSelected 
+                                        ? "bg-[var(--color-accent)] text-black font-semibold" 
+                                        : "hover:bg-white/10"
+                                    }`}
+                                  >
+                                    {text}
+                                  </span>
+                                  {idx < manualLeftScan.sentences.length - 1 ? " " : ""}
+                                </span>
                               );
                             })}
-                          </div>
+                          </p>
+                          {leftSentenceIdx === null && (
+                            <div className="mt-2 text-[10px] text-[var(--color-text-ghost)] flex items-center gap-1">
+                              <MousePointerClick size={10} /> Click a sentence to reveal its attention map
+                            </div>
+                          )}
                         </div>
                       </>
                     ) : null}
@@ -316,50 +345,71 @@ export default function ComparePage() {
                     <span className="text-sm font-semibold uppercase tracking-wider text-[var(--color-ok)]">High Sensitivity</span>
                     <span className="text-[10px] font-mono text-[var(--color-text-ghost)]">sigma=2.5 | layers=12</span>
                   </div>
-                  <div className="flex-1 relative bg-black/5 p-4 flex flex-col items-center justify-center">
+                  <div className="flex-1 relative bg-black/5 p-4 flex flex-col min-h-0">
                     {isAnalyzing ? (
-                      <div className="flex flex-col items-center gap-3">
+                      <div className="flex flex-col items-center justify-center h-full gap-3">
                         <Loader2 size={24} className="animate-spin text-[var(--color-ok)]" />
                         <span className="text-xs text-[var(--color-text-sub)]">Pipeline B running...</span>
                       </div>
                     ) : manualRightScan && manualOriginalImage ? (
                       <>
-                        <div className="flex-1 min-h-0 w-full flex flex-col gap-2">
-                          <div className="flex-1 flex flex-col items-center justify-center min-h-0 bg-black/20 rounded-md p-1 border border-white/5">
-                            <span className="text-[9px] uppercase tracking-widest text-[var(--color-text-ghost)] mb-1">Original Image</span>
+                        <div className="flex-1 min-h-0 w-full flex items-center justify-center p-2 relative">
+                          <div className="relative h-full w-full rounded-lg overflow-hidden border border-[rgba(255,255,255,0.05)] bg-black/20 flex items-center justify-center">
                             <img 
                               src={manualOriginalImage} 
                               alt="Original" 
-                              className="max-h-full max-w-full object-contain rounded"
+                              className="absolute inset-0 h-full w-full object-contain"
                             />
-                          </div>
-                          {manualRightScan.gradcam_results?.[0]?.overlay_b64 && (
-                            <div className="flex-1 flex flex-col items-center justify-center min-h-0 bg-black/20 rounded-md p-1 border border-white/5">
-                              <span className="text-[9px] uppercase tracking-widest text-[var(--color-text-ghost)] mb-1">Attention Map</span>
+                            {(rightSentenceIdx !== null && manualRightScan.sentence_results?.[rightSentenceIdx]?.overlay_b64) ? (
+                              <img 
+                                src={`data:image/png;base64,${manualRightScan.sentence_results[rightSentenceIdx].overlay_b64}`} 
+                                alt="Overlay Heatmap" 
+                                className="absolute inset-0 h-full w-full object-contain opacity-70 mix-blend-screen transition-all"
+                              />
+                            ) : manualRightScan.gradcam_results?.[0]?.overlay_b64 ? (
                               <img 
                                 src={`data:image/png;base64,${manualRightScan.gradcam_results[0].overlay_b64}`} 
-                                alt="Heatmap" 
-                                className="max-h-full max-w-full object-contain rounded"
+                                alt="Overlay Heatmap" 
+                                className="absolute inset-0 h-full w-full object-contain opacity-70 mix-blend-screen transition-all"
                               />
-                            </div>
-                          )}
+                            ) : null}
+                          </div>
                         </div>
-                        <div className="mt-4 p-3 rounded-lg bg-[var(--color-surface-dim)] border border-[var(--color-border)] w-full overflow-y-auto h-[45%] shrink-0 scrollbar-thin flex flex-col gap-2">
+                        <div className="mt-4 p-3 rounded-lg bg-[var(--color-surface-dim)] border border-[var(--color-border)] w-full overflow-y-auto h-[40%] shrink-0 scrollbar-thin flex flex-col gap-2">
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-bold uppercase text-[var(--color-text-ghost)]">Top Finding:</span>
                             <span className="text-sm font-semibold text-[var(--color-ok)]">{manualRightScan.top_pathology}</span>
                           </div>
-                          <div className="text-[10px] font-bold uppercase text-[var(--color-text-ghost)] mt-1">Generated Sentences</div>
-                          <div className="flex flex-col gap-1.5">
+                          <div className="text-[10px] font-bold uppercase text-[var(--color-text-ghost)] mt-1 mb-1">Generated Sentences</div>
+                          <p className="text-[13px] leading-relaxed text-[var(--color-text-sub)]">
                             {manualRightScan.sentences.map((s, idx) => {
                               const text = typeof s === "string" ? s : (s as any).sentence;
+                              const isSelected = rightSentenceIdx === idx;
                               return (
-                                <div key={idx} className="p-2 rounded bg-black/20 border border-[rgba(255,255,255,0.05)] text-xs text-[var(--color-text-sub)] leading-relaxed">
-                                  {text}
-                                </div>
+                                <span key={idx}>
+                                  <span
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-pressed={isSelected}
+                                    onClick={() => setRightSentenceIdx(isSelected ? null : idx)}
+                                    className={`cursor-pointer transition-colors px-1 py-0.5 rounded ${
+                                      isSelected 
+                                        ? "bg-[var(--color-ok)] text-black font-semibold" 
+                                        : "hover:bg-white/10"
+                                    }`}
+                                  >
+                                    {text}
+                                  </span>
+                                  {idx < manualRightScan.sentences.length - 1 ? " " : ""}
+                                </span>
                               );
                             })}
-                          </div>
+                          </p>
+                          {rightSentenceIdx === null && (
+                            <div className="mt-2 text-[10px] text-[var(--color-text-ghost)] flex items-center gap-1">
+                              <MousePointerClick size={10} /> Click a sentence to reveal its attention map
+                            </div>
+                          )}
                         </div>
                       </>
                     ) : null}

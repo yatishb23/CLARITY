@@ -225,73 +225,73 @@ export function ImageViewer() {
                 className="relative h-full transition-transform duration-300 ease-out"
                 style={{ aspectRatio: "1/1", transform: `scale(${scale})` }}
               >
-            {/* Image with vignette */}
-            <div className="relative h-full w-full rounded-lg overflow-hidden" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)" }}>
-              <img
-                src={uploadedImageDataUrl}
-                alt="Chest radiograph"
-                className="h-full w-full object-contain"
-                style={{
-                  filter: `brightness(${brightness}%) contrast(${contrast}%) ${invert ? 'invert(100%)' : ''}`
-                }}
-              />
+                {/* Image with vignette */}
+                <div className="relative h-full w-full rounded-lg overflow-hidden" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)" }}>
+                  <img
+                    src={uploadedImageDataUrl}
+                    alt="Chest radiograph"
+                    className="h-full w-full object-contain"
+                    style={{
+                      filter: `brightness(${brightness}%) contrast(${contrast}%) ${invert ? 'invert(100%)' : ''}`
+                    }}
+                  />
 
-              {/* Heatmap overlay */}
-              {currentOverlay && (
-                <img
-                  src={`data:image/png;base64,${currentOverlay}`}
-                  alt="Attention heatmap"
-                  className="absolute inset-0 h-full w-full object-contain transition-opacity duration-500"
-                  style={{ opacity: showOverlay ? overlayOpacity : 0 }}
-                />
-              )}
-
-              {/* Loading overlay */}
-              {isHeatmapLoading && (
-                <div
-                  className="absolute inset-0 flex items-center justify-center"
-                  style={{ background: "rgba(0,0,0,0.3)", backdropFilter: "blur(2px)" }}
-                >
-                  <div className="flex flex-col items-center gap-3">
-                    <div
-                      className="h-10 w-10 animate-spin rounded-full border-2"
-                      style={{ borderColor: "var(--color-accent)", borderTopColor: "transparent" }}
+                  {/* Heatmap overlay */}
+                  {currentOverlay && (
+                    <img
+                      src={`data:image/png;base64,${currentOverlay}`}
+                      alt="Attention heatmap"
+                      className="absolute inset-0 h-full w-full object-contain transition-opacity duration-500"
+                      style={{ opacity: showOverlay ? overlayOpacity : 0 }}
                     />
-                    <div className="flex items-center gap-1.5" style={{ color: "var(--color-accent)" }}>
-                      <Sparkles size={11} />
-                      <span className="text-[11px] font-medium">Loading attention…</span>
+                  )}
+
+                  {/* Loading overlay */}
+                  {isHeatmapLoading && (
+                    <div
+                      className="absolute inset-0 flex items-center justify-center"
+                      style={{ background: "rgba(0,0,0,0.3)", backdropFilter: "blur(2px)" }}
+                    >
+                      <div className="flex flex-col items-center gap-3">
+                        <div
+                          className="h-10 w-10 animate-spin rounded-full border-2"
+                          style={{ borderColor: "var(--color-accent)", borderTopColor: "transparent" }}
+                        />
+                        <div className="flex items-center gap-1.5" style={{ color: "var(--color-accent)" }}>
+                          <Sparkles size={11} />
+                          <span className="text-[11px] font-medium">Loading attention…</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Prompt hint */}
+                {!currentOverlay && !isHeatmapLoading && reportData && (
+                  <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
+                    <div
+                      className="flex items-center gap-2 rounded-full px-4 py-2"
+                      style={{
+                        background: "rgba(0,0,0,0.5)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        backdropFilter: "blur(8px)",
+                      }}
+                    >
+                      <ScanSearch size={12} style={{ color: "var(--color-accent)" }} />
+                      <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.45)" }}>
+                        Click a sentence in the report to visualize attention
+                      </span>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
 
-            {/* Prompt hint */}
-            {!currentOverlay && !isHeatmapLoading && reportData && (
-              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                <div
-                  className="flex items-center gap-2 rounded-full px-4 py-2"
-                  style={{
-                    background: "rgba(0,0,0,0.5)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    backdropFilter: "blur(8px)",
-                  }}
-                >
-                  <ScanSearch size={12} style={{ color: "var(--color-accent)" }} />
-                  <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.45)" }}>
-                    Click a sentence in the report to visualize attention
-                  </span>
+                {/* Corner badges */}
+                <div className="absolute bottom-3 right-3 flex gap-1.5">
+                  <span className="viewer-badge">PNG</span>
+                  <span className="viewer-badge">CXR</span>
                 </div>
+
               </div>
-            )}
-
-            {/* Corner badges */}
-            <div className="absolute bottom-3 right-3 flex gap-1.5">
-              <span className="viewer-badge">PNG</span>
-              <span className="viewer-badge">CXR</span>
-            </div>
-
-            </div>
             </div>
 
             {/* 3-Panel Detail View */}
