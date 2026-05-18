@@ -10,6 +10,7 @@ import {
   Bot,
   User,
   AlertTriangle,
+  Mic,
 } from "lucide-react";
 import { useClarityStore } from "@/lib/store";
 import type { ChatMessageDisplay } from "@/lib/api-types";
@@ -213,10 +214,50 @@ export function ChatBox() {
   const { sessionId, chatMessages, isChatLoading, addChatMessage, setChatLoading } = useClarityStore();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const hasSession = !!sessionId;
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = true;
+        
+        recognitionRef.current.onresult = (event: any) => {
+          let currentTranscript = "";
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            currentTranscript += event.results[i][0].transcript;
+          }
+          // Optional: You could append if you prefer, but replacing is simpler for single utterances
+          setInput(currentTranscript);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert("Speech recognition is not supported in your browser.");
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -392,6 +433,21 @@ export function ChatBox() {
                 className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[13px] disabled:opacity-50"
                 style={{ color: "var(--color-text)" }}
               />
+              <button
+                onClick={toggleListening}
+                disabled={isChatLoading || !hasSession}
+                className="flex h-6 w-6 items-center justify-center rounded-md transition-all disabled:opacity-25 relative group"
+                style={{
+                  background: isListening ? "rgba(239, 68, 68, 0.15)" : "transparent",
+                  color: isListening ? "#ef4444" : "var(--color-text-ghost)",
+                }}
+                title="Voice Dictation"
+              >
+                {isListening && (
+                  <div className="absolute inset-0 rounded-md animate-ping" style={{ background: "rgba(239, 68, 68, 0.4)" }} />
+                )}
+                <Mic size={12} className={isListening ? "relative z-10" : ""} />
+              </button>
               <button
                 id="chat-send-button"
                 onClick={handleSend}

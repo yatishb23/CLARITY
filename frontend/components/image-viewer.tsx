@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ZoomIn, ZoomOut, Layers, ScanSearch, Sparkles } from "lucide-react";
+import { ZoomIn, ZoomOut, Layers, ScanSearch, Sparkles, Sun, Contrast, RotateCw } from "lucide-react";
 import { useClarityStore } from "@/lib/store";
 
 export function ImageViewer() {
   const [scale, setScale] = useState(1);
   const [overlayOpacity, setOverlayOpacity] = useState(0.65);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [brightness, setBrightness] = useState(100);
+  const [contrast, setContrast] = useState(100);
+  const [invert, setInvert] = useState(false);
 
   const {
     uploadedImageDataUrl,
@@ -86,14 +89,56 @@ export function ImageViewer() {
                 type="range" min="0" max="1" step="0.05"
                 value={overlayOpacity}
                 onChange={(e) => setOverlayOpacity(parseFloat(e.target.value))}
-                className="h-[3px] w-20 cursor-pointer appearance-none rounded-full"
+                className="h-[3px] w-16 cursor-pointer appearance-none rounded-full"
                 style={{ background: "rgba(255,255,255,0.15)", accentColor: "var(--color-accent)" }}
               />
-              <span className="w-7 text-right font-mono text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>
-                {Math.round(overlayOpacity * 100)}%
-              </span>
             </div>
           )}
+
+          <div className="w-px h-4 mx-1" style={{ background: "rgba(255,255,255,0.1)" }} />
+
+          {/* PACS Adjustments */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setInvert(!invert)}
+              className="rounded p-1 transition-colors hover:bg-white/10"
+              style={{ color: invert ? "var(--color-text)" : "rgba(255,255,255,0.4)" }}
+              title="Invert Colors"
+            >
+              <RotateCw size={12} />
+            </button>
+            <div className="flex items-center gap-1.5 group relative" title="Brightness">
+              <Sun size={12} style={{ color: "rgba(255,255,255,0.4)" }} />
+              <input
+                type="range" min="50" max="150" step="1"
+                value={brightness}
+                onChange={(e) => setBrightness(parseInt(e.target.value))}
+                className="h-[3px] w-12 cursor-pointer appearance-none rounded-full"
+                style={{ background: "rgba(255,255,255,0.15)", accentColor: "var(--color-text-sub)" }}
+              />
+            </div>
+            <div className="flex items-center gap-1.5 group relative" title="Contrast">
+              <Contrast size={12} style={{ color: "rgba(255,255,255,0.4)" }} />
+              <input
+                type="range" min="50" max="150" step="1"
+                value={contrast}
+                onChange={(e) => setContrast(parseInt(e.target.value))}
+                className="h-[3px] w-12 cursor-pointer appearance-none rounded-full"
+                style={{ background: "rgba(255,255,255,0.15)", accentColor: "var(--color-text-sub)" }}
+              />
+            </div>
+            {(brightness !== 100 || contrast !== 100 || invert) && (
+              <button 
+                onClick={() => { setBrightness(100); setContrast(100); setInvert(false); }}
+                className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded opacity-50 hover:opacity-100 transition-opacity"
+                style={{ background: "rgba(255,255,255,0.1)", color: "white" }}
+              >
+                Reset
+              </button>
+            )}
+          </div>
+
+          <div className="w-px h-4 mx-1" style={{ background: "rgba(255,255,255,0.1)" }} />
 
           {/* Zoom controls */}
           <div
@@ -178,6 +223,9 @@ export function ImageViewer() {
                 src={uploadedImageDataUrl}
                 alt="Chest radiograph"
                 className="h-full w-full object-contain"
+                style={{
+                  filter: `brightness(${brightness}%) contrast(${contrast}%) ${invert ? 'invert(100%)' : ''}`
+                }}
               />
 
               {/* Heatmap overlay */}

@@ -193,6 +193,20 @@ export function Navbar() {
             Scan History
           </Link>
           <Link 
+            href="/compare"
+            className="text-[12px] font-medium transition-colors hover:opacity-80"
+            style={{ color: "var(--color-text-dim)" }}
+          >
+            Compare
+          </Link>
+          <Link 
+            href="/analytics"
+            className="text-[12px] font-medium transition-colors hover:opacity-80"
+            style={{ color: "var(--color-text-dim)" }}
+          >
+            Analytics
+          </Link>
+          <Link 
             href="/guidelines"
             className="text-[12px] font-medium transition-colors hover:opacity-80"
             style={{ color: "var(--color-text-dim)" }}
