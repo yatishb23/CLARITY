@@ -22,7 +22,7 @@ export default function Home() {
         {/* Right — Tabs Panel (45%) */}
         <div className="flex min-h-0 w-full flex-1 flex-col lg:h-full border-l border-[var(--color-border)]">
           {/* Tabs Header */}
-          <div className="flex px-2 border-b border-[var(--color-border)]">
+          <div className="flex items-center px-2 border-b border-[var(--color-border)]">
             <button
               onClick={() => setActiveTab('report')}
               className={`px-4 py-3 text-[12px] font-semibold tracking-wider uppercase transition-colors outline-none ${
@@ -42,6 +42,19 @@ export default function Home() {
               }`}
             >
               Ask AI
+            </button>
+            
+            <div className="flex-1" />
+            <button
+              onClick={() => window.print()}
+              className="px-3 py-1.5 text-[10px] font-semibold tracking-widest uppercase transition-colors rounded-md border"
+              style={{
+                borderColor: "var(--color-border)",
+                color: "var(--color-text-dim)",
+                background: "var(--color-surface-dim)",
+              }}
+            >
+              Print
             </button>
           </div>
 

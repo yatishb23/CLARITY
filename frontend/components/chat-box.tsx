@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, JSX } from "react";
 import {
   MessageSquare,
   ChevronDown,
@@ -210,7 +210,8 @@ function ChatBubble({ msg }: { msg: ChatMessageDisplay }) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function ChatBox() {
-  const { sessionId, chatMessages, chatHistory, isChatLoading, addChatMessage, setChatLoading, clearChatMessages, restorePastChat } = useClarityStore();
+  const { sessionId, chatMessages, isChatLoading, addChatMessage, setChatLoading } = useClarityStore();
+  const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -222,9 +223,8 @@ export function ChatBox() {
   }, [chatMessages]);
 
   useEffect(() => {
-    // Focus input on mount if session exists
-    if (hasSession) inputRef.current?.focus();
-  }, [hasSession]);
+    if (isOpen) inputRef.current?.focus();
+  }, [isOpen]);
 
   const handleSend = async () => {
     const text = input.trim();
@@ -290,137 +290,135 @@ export function ChatBox() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-transparent">
-      {/* Header tools (History & New Chat) */}
-      <div className="flex items-center justify-end px-5 py-2.5 gap-4">
-        {chatHistory.length > 0 && (
-          <select
-            className="bg-transparent text-[10px] uppercase font-semibold tracking-wider cursor-pointer outline-none hover:opacity-100 transition-opacity"
-            style={{ color: "var(--color-text-ghost)", appearance: "none" }}
-            onChange={(e) => {
-              if (e.target.value !== "current") {
-                restorePastChat(Number(e.target.value));
-                e.target.value = "current";
-              }
-            }}
-          >
-            <option value="current">History ({chatHistory.length})</option>
-            {chatHistory.map((_, i) => (
-              <option key={i} value={i} style={{ color: "var(--color-bg)", background: "var(--color-text)" }}>
-                Past Chat {i + 1}
-              </option>
-            ))}
-          </select>
-        )}
-
-        {hasSession && chatMessages.length > 0 && (
-          <button
-            onClick={() => clearChatMessages()}
-            className="text-[10px] uppercase font-semibold tracking-wider hover:opacity-100 transition-opacity"
-            style={{ color: "var(--color-text-ghost)" }}
-          >
-            New Chat
-          </button>
-        )}
-      </div>
-
-      <div className="flex flex-col flex-1 min-h-0">
-        {/* Messages */}
-        <div className="scrollbar-thin flex-1 space-y-3 overflow-y-auto px-4 py-3">
-          {chatMessages.length === 0 && (
-            <div className="flex flex-col items-center gap-2 py-6 text-center mt-4">
-              <Bot size={24} style={{ color: "var(--color-text-ghost)" }} />
-              {hasSession ? (
-                <p className="text-[12px] leading-relaxed mt-2" style={{ color: "var(--color-text-ghost)", maxWidth: 280 }}>
-                  Ask questions about this radiology scan, findings, or request Grad-CAM visualizations.
-                </p>
-              ) : (
-                <p className="text-[12px] leading-relaxed mt-2" style={{ color: "var(--color-text-ghost)", maxWidth: 280 }}>
-                  Upload a scan first to activate the AI assistant.
-                </p>
-              )}
-            </div>
+    <div
+      className="flex flex-col"
+      style={{
+        background: "var(--color-surface)",
+        borderTop: "1px solid var(--color-border)",
+      }}
+    >
+      {/* Header toggle */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between px-5 py-2.5 transition-colors"
+        style={{ color: "var(--color-text-dim)" }}
+        aria-expanded={isOpen}
+      >
+        <div className="flex items-center gap-2">
+          <MessageSquare size={13} style={{ color: "var(--color-text-dim)" }} />
+          <span className="text-[12px] font-semibold" style={{ color: "var(--color-text)" }}>
+            Ask AI
+          </span>
+          {chatMessages.length > 0 && (
+            <span className="text-[10px]" style={{ color: "var(--color-text-ghost)" }}>
+              · {chatMessages.length} message{chatMessages.length !== 1 ? "s" : ""}
+            </span>
           )}
-
-          {chatMessages.map((msg, i) => (
-            <ChatBubble key={i} msg={msg} />
-          ))}
-
-          {isChatLoading && (
-            <div className="flex items-center gap-2.5">
-              <div
-                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
-                style={{
-                  background: "var(--color-surface-dim)",
-                  border: "1px solid var(--color-border)",
-                }}
-              >
-                <Bot size={11} style={{ color: "var(--color-text-dim)" }} />
-              </div>
-              <div
-                className="flex items-center gap-1.5 rounded-xl px-3.5 py-2.5"
-                style={{
-                  background: "var(--color-surface-dim)",
-                  border: "1px solid var(--color-border)",
-                  color: "var(--color-text-ghost)",
-                }}
-              >
-                <Loader2 size={11} className="animate-spin" />
-                <span className="text-[12px]">Thinking…</span>
-              </div>
-            </div>
-          )}
-
-          <div ref={messagesEndRef} />
         </div>
+        <div style={{ color: "var(--color-text-ghost)" }}>
+          {isOpen ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
+        </div>
+      </button>
 
-        {/* Input */}
-        <div className="px-4 pb-4 pt-2 shrink-0">
-          <div
-            className="flex items-center gap-2 rounded-lg px-3 py-2"
-            style={{
-              background: "var(--color-surface-dim)",
-              border: "1px solid var(--color-border)",
-            }}
-          >
-            <input
-              ref={inputRef}
-              id="chat-input"
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={hasSession ? "Ask about this scan…" : "Upload a scan to chat…"}
-              disabled={isChatLoading || !hasSession}
-              className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[13px] disabled:opacity-50"
-              style={{ color: "var(--color-text)" }}
-            />
-            <button
-              id="chat-send-button"
-              onClick={handleSend}
-              disabled={!input.trim() || isChatLoading || !hasSession}
-              className="flex h-6 w-6 items-center justify-center rounded-md transition-all disabled:opacity-25"
-              style={{
-                background: input.trim() && !isChatLoading && hasSession ? "var(--color-text)" : "transparent",
-                color: input.trim() && !isChatLoading && hasSession ? "var(--color-bg)" : "var(--color-text-ghost)",
-              }}
-              aria-label="Send message"
-            >
-              {isChatLoading ? (
-                <Loader2 size={12} className="animate-spin" />
-              ) : (
-                <Send size={12} />
-              )}
-            </button>
+      {isOpen && (
+        <div className="flex flex-col" style={{ maxHeight: "min(45vh, 400px)" }}>
+          {/* Messages */}
+          <div className="scrollbar-thin flex-1 space-y-3 overflow-y-auto px-4 py-3">
+            {chatMessages.length === 0 && (
+              <div className="flex flex-col items-center gap-2 py-6 text-center">
+                <Bot size={18} style={{ color: "var(--color-text-ghost)" }} />
+                {hasSession ? (
+                  <p className="text-[12px] leading-relaxed" style={{ color: "var(--color-text-ghost)", maxWidth: 240 }}>
+                    Ask questions about this radiology scan, findings, or request Grad-CAM visualizations.
+                  </p>
+                ) : (
+                  <p className="text-[12px] leading-relaxed" style={{ color: "var(--color-text-ghost)", maxWidth: 240 }}>
+                    Upload a scan first to activate the AI assistant.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {chatMessages.map((msg, i) => (
+              <ChatBubble key={i} msg={msg} />
+            ))}
+
+            {isChatLoading && (
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                  style={{
+                    background: "var(--color-surface-dim)",
+                    border: "1px solid var(--color-border)",
+                  }}
+                >
+                  <Bot size={11} style={{ color: "var(--color-text-dim)" }} />
+                </div>
+                <div
+                  className="flex items-center gap-1.5 rounded-xl px-3.5 py-2.5"
+                  style={{
+                    background: "var(--color-surface-dim)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-text-ghost)",
+                  }}
+                >
+                  <Loader2 size={11} className="animate-spin" />
+                  <span className="text-[12px]">Thinking…</span>
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* Scope hint */}
-          <p className="mt-2 flex items-center gap-1.5 text-[10px]" style={{ color: "var(--color-text-ghost)" }}>
-            <AlertTriangle size={10} />
-            Radiology context only — findings, pathologies, and visualizations.
-          </p>
+          {/* Input */}
+          <div className="px-4 pb-3 pt-1">
+            <div
+              className="flex items-center gap-2 rounded-lg px-3 py-2"
+              style={{
+                background: "var(--color-surface-dim)",
+                border: "1px solid var(--color-border)",
+              }}
+            >
+              <input
+                ref={inputRef}
+                id="chat-input"
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={hasSession ? "Ask about this scan…" : "Upload a scan to chat…"}
+                disabled={isChatLoading || !hasSession}
+                className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[13px] disabled:opacity-50"
+                style={{ color: "var(--color-text)" }}
+              />
+              <button
+                id="chat-send-button"
+                onClick={handleSend}
+                disabled={!input.trim() || isChatLoading || !hasSession}
+                className="flex h-6 w-6 items-center justify-center rounded-md transition-all disabled:opacity-25"
+                style={{
+                  background: input.trim() && !isChatLoading && hasSession ? "var(--color-text)" : "transparent",
+                  color: input.trim() && !isChatLoading && hasSession ? "var(--color-bg)" : "var(--color-text-ghost)",
+                }}
+                aria-label="Send message"
+              >
+                {isChatLoading ? (
+                  <Loader2 size={12} className="animate-spin" />
+                ) : (
+                  <Send size={12} />
+                )}
+              </button>
+            </div>
+
+            {/* Scope hint */}
+            <p className="mt-1.5 flex items-center gap-1 text-[10px]" style={{ color: "var(--color-text-ghost)" }}>
+              <AlertTriangle size={9} />
+              Radiology context only — findings, pathologies, and visualizations.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -266,3 +266,30 @@
   }
   .dark .prose-chat code { background: rgba(255,255,255,0.08); }
 }
+
+/* ── Print Styles ────────────────────────────────────────── */
+@media print {
+  /* Hide navbar and chat elements */
+  header, nav, button, .chat-box-container, .print-hidden {
+    display: none !important;
+  }
+  
+  /* Reset background and text for print */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* Ensure the main report and image fill the space */
+  main {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+  }
+  
+  .glass-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    page-break-inside: avoid;
+  }
+}

@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { useClarityStore } from "@/lib/store";
 import { ModeToggle } from "@/components/ModeToggle";
 import type { AnalyzeResponse, ReportOnlyResponse } from "@/lib/api-types";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 // ─── Shutdown ─────────────────────────────────────────────────────────────────
 
@@ -173,6 +175,33 @@ export function Navbar() {
             </p>
           </div>
         </div>
+
+        {/* Navigation Links */}
+        <nav className="hidden md:flex items-center gap-6 ml-8">
+          <Link 
+            href="/"
+            className="text-[12px] font-medium transition-colors hover:opacity-80"
+            style={{ color: "var(--color-text)" }}
+          >
+            Dashboard
+          </Link>
+          <Link 
+            href="/history"
+            className="text-[12px] font-medium transition-colors hover:opacity-80"
+            style={{ color: "var(--color-text-dim)" }}
+          >
+            Scan History
+          </Link>
+          <Link 
+            href="/guidelines"
+            className="text-[12px] font-medium transition-colors hover:opacity-80"
+            style={{ color: "var(--color-text-dim)" }}
+          >
+            Guidelines
+          </Link>
+        </nav>
+
+        <div className="flex-1" />
 
         {/* Model badge */}
         {reportData && (
